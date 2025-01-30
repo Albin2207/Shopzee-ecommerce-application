@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "27359421590",
+    "project_id": "shopzee-d1596",
+    "storage_bucket": "shopzee-d1596.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:27359421590:android:e645b9e21be63d8c9f8eb7",
+        "android_client_info": {
+          "package_name": "com.example.admin_shoppingapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaAyjbYp7V3fL1s-1qY_NjF-7DmP_-2U8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:27359421590:android:f15fb2d1e9d164dc9f8eb7",
+        "android_client_info": {
+          "package_name": "com.example.user_shoppingapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaAyjbYp7V3fL1s-1qY_NjF-7DmP_-2U8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
