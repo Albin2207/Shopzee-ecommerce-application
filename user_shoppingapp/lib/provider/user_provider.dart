@@ -12,8 +12,14 @@ class UserProvider extends ChangeNotifier {
 
   String name = "";
   String email = "";
-  String address = "";
   String phone = "";
+  String alternatePhone = "";
+  String pincode = "";
+  String state = "";
+  String city = "";
+  String houseNo = "";
+  String roadName = "";
+
   bool isLoggedIn = false;
 
   UserProvider() {
@@ -25,7 +31,7 @@ class UserProvider extends ChangeNotifier {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       isLoggedIn = true;
-      loadUserData();//added to make sure login loads user data in profile page. remove if it doesnt work
+      loadUserData();
       notifyListeners();
     }
   }
@@ -33,14 +39,47 @@ class UserProvider extends ChangeNotifier {
   void loadUserData() {
     _userSubscription?.cancel();
     _userSubscription = DbService().readUserData().listen((snapshot) {
-      print(snapshot.data());
-      final UserModel data = UserModel.fromJson(snapshot.data() as Map<String, dynamic>);
+      final UserModel data =
+          UserModel.fromJson(snapshot.data() as Map<String, dynamic>);
       name = data.name;
       email = data.email;
-      address = data.address;
       phone = data.phone;
+      alternatePhone = data.alternatePhone;
+      pincode = data.pincode;
+      state = data.state;
+      city = data.city;
+      houseNo = data.houseNo;
+      roadName = data.roadName;
+
       notifyListeners();
     });
+  }
+
+  Future<void> updateProfile({
+    required String name,
+    required String email,
+    required String phone,
+    required String alternatePhone,
+    required String pincode,
+    required String state,
+    required String city,
+    required String houseNo,
+    required String roadName,
+
+  }) async {
+    final data = {
+      "name": name,
+      "email": email,
+      "phone": phone,
+      "alternatePhone": alternatePhone,
+      "pincode": pincode,
+      "state": state,
+      "city": city,
+      "houseNo": houseNo,
+      "roadName": roadName,
+
+    };
+    await DbService().updateUserData(extraData: data);
   }
 
   Future<void> logout() async {

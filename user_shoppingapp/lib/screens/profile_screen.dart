@@ -83,6 +83,13 @@ class ProfileScreen extends StatelessWidget {
                   Navigator.pushNamed(context, "/discount");
                 },
               ),
+               Listtile(
+                title: 'Saved adddress',
+                icon: Icons.discount_outlined,
+                onPress: () {
+                  Navigator.pushNamed(context, "/address");
+                },
+              ),
               const Divider(thickness: 1, endIndent: 10, indent: 10),
               Listtile(
                 title: 'Help & Support',

@@ -4,14 +4,14 @@ class ProductsModel {
   String name;
   String description;
   String image;
-  List<String> images;  // Added for multiple images
+  List<String> images; 
   int old_price;
   int new_price;
   String category;
   String id;
   int maxQuantity;
-  List<String> sizes;   // Added for sizes
-  List<String> colors;  // Added for colors
+  List<String> sizes;   
+  List<String> colors;  
 
   ProductsModel({
     required this.name,

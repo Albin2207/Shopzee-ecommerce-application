@@ -2,6 +2,7 @@ import 'package:admin_shoppingapp/controllers/cloudinary_service.dart';
 import 'package:admin_shoppingapp/controllers/db_service.dart';
 import 'package:admin_shoppingapp/models/products_model.dart';
 import 'package:admin_shoppingapp/providers/admin_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -25,12 +26,14 @@ class _ModifyProductState extends State<ModifyProduct> {
   
   final ImagePicker picker = ImagePicker();
   
-  // New variables for multiple images and variants
   List<String> imageUrls = [];
   List<String> selectedSizes = [];
   List<String> selectedColors = [];
 
-  // Predefined lists for sizes and colors
+  // Added variable to track total variants
+  int get totalVariants => selectedSizes.length * selectedColors.length;
+  String _variantQuantityText = '';
+  
   final List<String> availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   final List<String> availableColors = ['Red', 'Blue', 'Green', 'Black', 'White', 'Grey'];
 
@@ -57,6 +60,7 @@ class _ModifyProductState extends State<ModifyProduct> {
       } else {
         selectedSizes.add(size);
       }
+      _updateQuantityPerVariant();
     });
   }
 
@@ -67,7 +71,22 @@ class _ModifyProductState extends State<ModifyProduct> {
       } else {
         selectedColors.add(color);
       }
+      _updateQuantityPerVariant();
     });
+  }
+
+  void _updateQuantityPerVariant() {
+    if (totalVariants > 0 && quantityController.text.isNotEmpty) {
+      int totalQuantity = int.tryParse(quantityController.text) ?? 0;
+      int quantityPerVariant = totalQuantity ~/ totalVariants;
+      setState(() {
+        _variantQuantityText = 'Each variant will have $quantityPerVariant units';
+      });
+    } else {
+      setState(() {
+        _variantQuantityText = '';
+      });
+    }
   }
 
   setData(ProductsModel data) {
@@ -81,6 +100,7 @@ class _ModifyProductState extends State<ModifyProduct> {
     imageUrls = data.images;
     selectedSizes = data.sizes;
     selectedColors = data.colors;
+    _updateQuantityPerVariant();
     setState(() {});
   }
 
@@ -140,12 +160,24 @@ class _ModifyProductState extends State<ModifyProduct> {
                   controller: quantityController,
                   validator: (v) => v!.isEmpty ? "This cant be empty." : null,
                   decoration: InputDecoration(
-                    hintText: "Quantity Left",
-                    label: Text("Quantity Left"),
+                    hintText: "Total Quantity",
+                    label: Text("Total Quantity"),
                     fillColor: Colors.deepPurple.shade50,
                     filled: true
                   ),
+                  onChanged: (value) => _updateQuantityPerVariant(),
                 ),
+                if (_variantQuantityText.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      _variantQuantityText,
+                      style: TextStyle(
+                        color: Colors.deepPurple,
+                        fontStyle: FontStyle.italic
+                      ),
+                    ),
+                  ),
                 SizedBox(height: 10),
                 TextFormField(
                   controller: categoryController,
@@ -202,10 +234,20 @@ class _ModifyProductState extends State<ModifyProduct> {
                   maxLines: 8,
                 ),
                 
-                // Size Selection
+                // Size Selection with count
                 const SizedBox(height: 20),
-                const Text("Select Sizes:", 
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Select Sizes:",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+                    ),
+                    Text(
+                      "${selectedSizes.length} selected",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
                 ),
                 Wrap(
                   spacing: 8,
@@ -218,10 +260,20 @@ class _ModifyProductState extends State<ModifyProduct> {
                   )).toList(),
                 ),
 
-                // Color Selection
+                // Color Selection with count
                 const SizedBox(height: 20),
-                const Text("Select Colors:", 
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Select Colors:",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+                    ),
+                    Text(
+                      "${selectedColors.length} selected",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
                 ),
                 Wrap(
                   spacing: 8,
@@ -234,13 +286,41 @@ class _ModifyProductState extends State<ModifyProduct> {
                   )).toList(),
                 ),
 
+                // Variant Summary
+                if (totalVariants > 0)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Card(
+                      color: Colors.deepPurple.shade50,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Variant Summary:",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text("Total variants: $totalVariants"),
+                            Text("Size options: ${selectedSizes.join(', ')}"),
+                            Text("Color options: ${selectedColors.join(', ')}"),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
                 // Image Section
                 const SizedBox(height: 20),
-                const Text("Product Images:", 
+                const Text(
+                  "Product Images:",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
                 ),
                 
-                // Image preview section
                 imageUrls.isEmpty
                     ? const Center(child: Text("No images selected"))
                     : SizedBox(
@@ -303,6 +383,13 @@ class _ModifyProductState extends State<ModifyProduct> {
                           return;
                         }
                         
+                        if (selectedSizes.isEmpty || selectedColors.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Please select at least one size and color"))
+                          );
+                          return;
+                        }
+
                         Map<String, dynamic> data = {
                           "name": nameController.text,
                           "old_price": int.parse(oldPriceController.text),
@@ -313,29 +400,34 @@ class _ModifyProductState extends State<ModifyProduct> {
                           "images": imageUrls,
                           "sizes": selectedSizes,
                           "colors": selectedColors,
+                          "variant_count": totalVariants,
+                          "updated_at": FieldValue.serverTimestamp(),
                         };
 
                         if (productId.isNotEmpty) {
                           DbService().updateProduct(docId: productId, data: data);
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Product Updated")));
+                              SnackBar(content: Text("Product and variants updated"))
+                          );
                         } else {
                           DbService().createProduct(data: data);
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Product Added")));
+                              SnackBar(content: Text("Product and variants added"))
+                          );
                         }
                       }
                     },
                     child: Text(productId.isNotEmpty ? "Update Product" : "Add Product")
                   )
-                )
+                ),
+                SizedBox(height: 20),
               ],
             ),
           ),
-        ),
-      ),
-    );
+      )
+      )
+  );
   }
-}
+  }

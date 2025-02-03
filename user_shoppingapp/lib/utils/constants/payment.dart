@@ -5,8 +5,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import  'package:http/http.dart' as http;
 
 Future createPaymentIntent({required String name,
-  required String address,
-
+  required String phone,
+  required String pincode,
+  required String state,
+  required String city,
+  required String houseNo,
+  required String roadName,
   required String amount}) async{
 
   final url = Uri.parse('https://api.stripe.com/v1/payment_intents');
@@ -17,7 +21,11 @@ Future createPaymentIntent({required String name,
     'automatic_payment_methods[enabled]': 'true',
     'description': "Shop Payment",
     'shipping[name]': name,
-    'shipping[address][line1]': address,
+    'shipping[phone]': phone,
+     'shipping[address][line1]': '$houseNo, $roadName', 
+    'shipping[address][city]': city,
+    'shipping[address][state]': state,
+    'shipping[address][postal_code]': pincode,
     'shipping[address][country]': "IN"
   };
 

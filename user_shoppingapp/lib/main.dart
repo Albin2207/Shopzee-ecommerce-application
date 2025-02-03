@@ -5,11 +5,14 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:user_shoppingapp/firebase_options.dart';
+import 'package:user_shoppingapp/provider/address_provider.dart';
 import 'package:user_shoppingapp/provider/cart_provider.dart';
 import 'package:user_shoppingapp/provider/filter_provider.dart';
 import 'package:user_shoppingapp/provider/search_provider.dart';
 import 'package:user_shoppingapp/provider/user_provider.dart';
 import 'package:user_shoppingapp/provider/wishlist_provider.dart';
+import 'package:user_shoppingapp/screens/add_addess_screen.dart';
+import 'package:user_shoppingapp/screens/address_screen.dart';
 import 'package:user_shoppingapp/screens/cart_screen.dart';
 import 'package:user_shoppingapp/screens/categories_screen.dart';
 import 'package:user_shoppingapp/screens/checkout_screen.dart';
@@ -32,11 +35,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await dotenv.load(fileName: ".env");
-  Stripe.publishableKey=dotenv.env["STRIPE_PUBLISH_KEY"]!;
-   Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
+  Stripe.publishableKey = dotenv.env["STRIPE_PUBLISH_KEY"]!;
+  Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
   Stripe.urlScheme = 'flutterstripe';
   await Stripe.instance.applySettings();
-  
+
   runApp(const App());
 }
 
@@ -49,9 +52,14 @@ class App extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()..initializeUser()),
         ChangeNotifierProvider(create: (_) => SearchProvider()),
-        ChangeNotifierProvider(create: (context) =>  CartProvider(),),
+        ChangeNotifierProvider(
+          create: (context) => CartProvider(),
+        ),
         ChangeNotifierProvider(create: (_) => FilterProvider()),
-        ChangeNotifierProvider(create: (_) => WishlistProvider()),
+        ChangeNotifierProvider(
+          create: (_) => WishlistProvider()..loadAllWishlists(),
+        ),
+        ChangeNotifierProvider(create: (_) => SelectedAddressProvider()),
       ],
       child: MaterialApp(
         title: "Shopzee",
@@ -68,17 +76,19 @@ class App extends StatelessWidget {
           "/signup": (context) => const SignupPage(),
           "/home": (context) => const MainPage(),
           "/update_profile": (context) => const UpdateProfile(),
-          "/specific": (context)=> SpecificProducts(),
-          "/view_product":(context)=> ViewProduct(),
-          "/search_screen":(context)=> SearchResultsScreen(),
-          "/cart": (context)=> CartPage(),
-          "/wishlist": (context) => WishlistPage(),
+          "/specific": (context) => SpecificProducts(),
+          "/view_product": (context) => ViewProduct(),
+          "/search_screen": (context) => SearchResultsScreen(),
+          "/cart": (context) => CartPage(),
+          "/wishlist": (context) => WishlistsPage(),
+          "/wishlist_items": (context) => WishlistItemsPage(),
           "/categories": (context) => CategoriesScreen(),
-          "/discount": (context)=> DiscountPage(),
-           "/checkout":(context)=> CheckoutPage(),
-          "/orders":(context)=> OrdersPage(),
-          "/view_order":(context)=> ViewOrder(),
-
+          "/discount": (context) => DiscountPage(),
+          "/checkout": (context) => CheckoutPage(),
+          "/orders": (context) => OrdersPage(),
+          "/view_order": (context) => ViewOrder(),
+          "/address": (context) => AddressesPage(),
+          "/add_address": (context) => AddAddressPage(),
         },
       ),
     );
@@ -105,10 +115,10 @@ class _CheckUserState extends State<CheckUser> {
       if (isFirstLaunch) {
         Navigator.pushReplacementNamed(context, "/onboarding");
       } else {
-        final userProvider = Provider.of<UserProvider>(context, listen: false); 
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
         await userProvider.initializeUser();
         if (mounted) {
-          if (userProvider.isLoggedIn) {  
+          if (userProvider.isLoggedIn) {
             Navigator.pushReplacementNamed(context, "/home");
           } else {
             Navigator.pushReplacementNamed(context, "/login");
@@ -127,6 +137,7 @@ class _CheckUserState extends State<CheckUser> {
     );
   }
 }
+
 class FirstLaunchCheck {
   static const String _keyFirstLaunch = 'isFirstLaunch';
 

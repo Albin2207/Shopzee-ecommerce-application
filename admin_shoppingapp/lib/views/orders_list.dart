@@ -43,12 +43,12 @@ class _OrdersPageState extends State<OrdersPage> {
       required Color bgColor,
       required Color textColor}) {
     return Container(
+      color: bgColor,
+      padding: EdgeInsets.all(8),
       child: Text(
         text,
         style: TextStyle(color: textColor),
       ),
-      color: bgColor,
-      padding: EdgeInsets.all(8),
     );
   }
 
@@ -66,7 +66,7 @@ class _OrdersPageState extends State<OrdersPage> {
       body: Consumer<AdminProvider>(
         builder: (context, value, child) {
           List<OrdersModel> orders =
-              OrdersModel.fromJsonList(value.orders) as List<OrdersModel>;
+              OrdersModel.fromJsonList(value.orders);
 
           if (orders.isEmpty) {
             return Center(
@@ -155,7 +155,7 @@ class _ViewOrderState extends State<ViewOrder> {
                             children: [
                               Row(
                                 children: [
-                                  Container(
+                                  SizedBox(
                                     height: 50,
                                     width: 50,
                                     child: Image.network(e.image),
@@ -210,7 +210,6 @@ class _ViewOrderState extends State<ViewOrder> {
                 height: 60,
                 width: MediaQuery.of(context).size.width * .9,
                 child: ElevatedButton(
-                  child: Text("Modify Order"),
                   onPressed: () {
                     showDialog(
                         context: context,
@@ -221,6 +220,7 @@ class _ViewOrderState extends State<ViewOrder> {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white),
+                  child: Text("Modify Order"),
                 ),
               )
             ],

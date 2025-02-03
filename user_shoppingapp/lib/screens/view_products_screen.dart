@@ -4,7 +4,9 @@ import 'package:user_shoppingapp/models/cart_model.dart';
 import 'package:user_shoppingapp/models/product_model.dart';
 import 'package:user_shoppingapp/provider/cart_provider.dart';
 import 'package:user_shoppingapp/provider/wishlist_provider.dart';
+
 import 'package:user_shoppingapp/utils/constants/discount.dart';
+import 'package:user_shoppingapp/widgets/wishlist_dialog.dart';
 
 class ViewProduct extends StatefulWidget {
   const ViewProduct({super.key});
@@ -49,32 +51,28 @@ class _ViewProductState extends State<ViewProduct> {
         scrolledUnderElevation: 0,
         forceMaterialTransparency: true,
         actions: [
-          Consumer<WishlistProvider>(
-            builder: (context, wishlistProvider, child) {
-              return IconButton(
-                icon: Icon(
-                  wishlistProvider.isWishlisted(product.id)
-                      ? Icons.favorite
-                      : Icons.favorite_border,
-                  color: wishlistProvider.isWishlisted(product.id)
-                      ? Colors.red
-                      : null,
-                ),
-                onPressed: () {
-                  wishlistProvider.toggleWishlist(product.id);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        wishlistProvider.isWishlisted(product.id)
-                            ? "Removed from wishlist"
-                            : "Added to Wishlist",
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
+         Consumer<WishlistProvider>(
+  builder: (context, wishlistProvider, child) {
+    return IconButton(
+      icon: Icon(
+        wishlistProvider.isWishlisted(product.id)
+            ? Icons.favorite
+            : Icons.favorite_border,
+        color: wishlistProvider.isWishlisted(product.id)
+            ? Colors.red
+            : null,
+      ),
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) => WishlistSelectionDialog(
+            productId: product.id,
           ),
+        );
+      },
+    );
+  },
+)
         ],
       ),
       body: SingleChildScrollView(
