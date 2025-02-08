@@ -237,7 +237,9 @@ class DbService {
         .update({"quantity": FieldValue.increment(-quantity)});
   }
 
-  // CART FUNCTIONS
+   // CART
+  // display the user cart
+
   Stream<QuerySnapshot> readUserCart() {
     return FirebaseFirestore.instance
         .collection("shop_users")
@@ -246,8 +248,10 @@ class DbService {
         .snapshots();
   }
 
+  // adding product to the cart
   Future addToCart({required CartModel cartData}) async {
     try {
+      // update
       await FirebaseFirestore.instance
           .collection("shop_users")
           .doc(user!.uid)
@@ -255,28 +259,23 @@ class DbService {
           .doc(cartData.productId)
           .update({
         "product_id": cartData.productId,
-        "quantity": FieldValue.increment(1),
-        "selected_size": cartData.selectedSize,
-        "selected_color": cartData.selectedColor,
+        "quantity": FieldValue.increment(1)
       });
     } on FirebaseException catch (e) {
       print("firebase exception : ${e.code}");
       if (e.code == "not-found") {
+        // insert
         await FirebaseFirestore.instance
             .collection("shop_users")
             .doc(user!.uid)
             .collection("cart")
             .doc(cartData.productId)
-            .set({
-          "product_id": cartData.productId,
-          "quantity": 1,
-          "selected_size": cartData.selectedSize,
-          "selected_color": cartData.selectedColor,
-        });
+            .set({"product_id": cartData.productId, "quantity": 1});
       }
     }
   }
 
+  // delete specific product from cart
   Future deleteItemFromCart({required String productId}) async {
     await FirebaseFirestore.instance
         .collection("shop_users")
@@ -286,6 +285,7 @@ class DbService {
         .delete();
   }
 
+  // empty users cart
   Future emptyCart() async {
     await FirebaseFirestore.instance
         .collection("shop_users")
@@ -299,6 +299,7 @@ class DbService {
     });
   }
 
+  // decrease count of item
   Future decreaseCount({required String productId}) async {
     await FirebaseFirestore.instance
         .collection("shop_users")
@@ -307,7 +308,7 @@ class DbService {
         .doc(productId)
         .update({"quantity": FieldValue.increment(-1)});
   }
-
+  
   // ORDERS
   Future createOrder({required Map<String, dynamic> data}) async {
     await FirebaseFirestore.instance.collection("shop_orders").add(data);

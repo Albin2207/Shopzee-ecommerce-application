@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:user_shoppingapp/controllers/database_service.dart';
 import 'package:user_shoppingapp/models/address_model.dart';
+import 'package:user_shoppingapp/utils/constants/app_permission.dart';
 
 class AddAddressPage extends StatefulWidget {
   final AddressModel? addressToEdit;
@@ -47,10 +50,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
 
       try {
         if (widget.addressToEdit != null) {
-          await DbService().updateAddress(
-            widget.addressToEdit!.id,
-            addressData,
-          );
+          await DbService().updateAddress(widget.addressToEdit!.id, addressData);
         } else {
           await DbService().addAddress(addressData);
         }
@@ -71,6 +71,68 @@ class _AddAddressPageState extends State<AddAddressPage> {
           );
         }
       }
+    }
+  }
+
+  Future<void> _fetchCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Location services are disabled.')),
+      );
+      return;
+    }
+
+    // Check for location permissions
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Location permission denied.')),
+        );
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Location permission permanently denied.')),
+      );
+      return;
+    }
+
+    // Fetch user location
+    Position position = await Geolocator.getCurrentPosition();
+    _getAddressFromLatLng(position);
+  }
+
+  Future<void> _getAddressFromLatLng(Position position) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+
+        // Autofill fields with fetched data
+        setState(() {
+          _pincodeController.text = place.postalCode ?? '';
+          _stateController.text = place.administrativeArea ?? '';
+          _cityController.text = place.locality ?? '';
+          _roadNameController.text = place.street ?? '';
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching address: $e')),
+      );
     }
   }
 
@@ -144,14 +206,29 @@ class _AddAddressPageState extends State<AddAddressPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                TextFormField(
-                  controller: _pincodeController,
-                  decoration: const InputDecoration(
-                    labelText: "Pincode",
-                    hintText: "Pincode",
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) => validateField(value, "Pincode"),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _pincodeController,
+                        decoration: const InputDecoration(
+                          labelText: "Pincode",
+                          hintText: "Pincode",
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) => validateField(value, "Pincode"),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        await getLocation();//ask for location access
+                        await _fetchCurrentLocation();//access location
+                      },
+                      icon: const Icon(Icons.my_location),
+                      label: const Text('Use My Location'),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
@@ -204,7 +281,9 @@ class _AddAddressPageState extends State<AddAddressPage> {
                       foregroundColor: Colors.white,
                     ),
                     child: Text(
-                      widget.addressToEdit != null ? 'Update Address' : 'Add Address',
+                      widget.addressToEdit != null
+                          ? 'Update Address'
+                          : 'Add Address',
                       style: const TextStyle(fontSize: 16),
                     ),
                   ),

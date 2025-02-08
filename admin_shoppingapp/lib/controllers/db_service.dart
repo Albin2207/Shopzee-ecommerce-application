@@ -101,7 +101,7 @@ class DbService {
           'size': size,
           'color': color,
           'quantity': variantQuantity,
-          'variantSKU': '${docId}-${size.toLowerCase()}-${color.toLowerCase()}',
+          'variantSKU': '$docId-${size.toLowerCase()}-${color.toLowerCase()}',
           'price': data['new_price'],
           'updated_at': FieldValue.serverTimestamp(),
         };

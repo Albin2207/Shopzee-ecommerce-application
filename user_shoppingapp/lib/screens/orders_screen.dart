@@ -157,18 +157,28 @@ class _ViewOrderState extends State<ViewOrder> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Row(
-                                children: [
-                                  SizedBox(
-                                    height: 50,
-                                    width: 50,
-                                    child: Image.network(e.image),
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(child: Text(e.name)),
-                                ],
-                              ),
+  children: [
+    SizedBox(
+      height: 50,
+      width: 50,
+      child: e.images.isNotEmpty
+          ? PageView.builder(
+              itemCount: e.images.length,
+              itemBuilder: (context, imgIndex) {
+                return Image.network(
+                  e.images[imgIndex],
+                  errorBuilder: (context, error, stackTrace) =>
+                      Icon(Icons.image_not_supported, size: 50),
+                );
+              },
+            )
+          : Icon(Icons.image_not_supported, size: 50),
+    ),
+    SizedBox(width: 10),
+    Expanded(child: Text(e.name)),
+  ],
+),
+
                               Text(
                                 "₹${e.single_price.toString()} x ${e.quantity.toString()} quantity",
                                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -209,25 +219,25 @@ class _ViewOrderState extends State<ViewOrder> {
               SizedBox(
                 height: 8,
               ),
-          args.status=="PAID" || args.status=="ON_THE_WAY" ? 
-              SizedBox(
-                height: 60,
-                width: MediaQuery.of(context).size.width * .9,
-                child: ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) => ModifyOrder(
-                              order: args,
-                            ));
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white),
-                  child: Text("Modify Order"),
-                ),
-              ):
-              SizedBox(),
+              args.status == "PAID" || args.status == "ON_THE_WAY"
+                  ? SizedBox(
+                      height: 60,
+                      width: MediaQuery.of(context).size.width * .9,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) => ModifyOrder(
+                                    order: args,
+                                  ));
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white),
+                        child: Text("Modify Order"),
+                      ),
+                    )
+                  : SizedBox(),
             ],
           ),
         ),
