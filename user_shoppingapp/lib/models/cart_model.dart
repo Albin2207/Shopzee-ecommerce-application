@@ -3,14 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class CartModel {
   final String productId;
   int quantity;
-  String? selectedSize;  // Added
-  String? selectedColor; // Added
+  String? selectedSize;
+  String? selectedColor;
 
   CartModel({
     required this.productId,
     required this.quantity,
-    this.selectedSize,   // Added
-    this.selectedColor,  // Added
+    this.selectedSize,
+    this.selectedColor,
   });
 
   factory CartModel.fromJson(Map<String, dynamic> json) {
@@ -23,17 +23,32 @@ class CartModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    final Map<String, dynamic> data = {
       "product_id": productId,
       "quantity": quantity,
-      "selected_size": selectedSize,
-      "selected_color": selectedColor,
     };
+    
+    if (selectedSize != null) data["selected_size"] = selectedSize;
+    if (selectedColor != null) data["selected_color"] = selectedColor;
+    
+    return data;
   }
 
   static List<CartModel> fromJsonList(List<QueryDocumentSnapshot> list) {
-    return list
-        .map((e) => CartModel.fromJson(e.data() as Map<String, dynamic>))
-        .toList();
+    return list.map((doc) => CartModel.fromJson(doc.data() as Map<String, dynamic>)).toList();
+  }
+
+  CartModel copyWith({
+    String? productId,
+    int? quantity,
+    String? selectedSize,
+    String? selectedColor,
+  }) {
+    return CartModel(
+      productId: productId ?? this.productId,
+      quantity: quantity ?? this.quantity,
+      selectedSize: selectedSize ?? this.selectedSize,
+      selectedColor: selectedColor ?? this.selectedColor,
+    );
   }
 }

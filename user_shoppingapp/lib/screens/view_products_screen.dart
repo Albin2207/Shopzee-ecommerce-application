@@ -4,9 +4,8 @@ import 'package:user_shoppingapp/models/cart_model.dart';
 import 'package:user_shoppingapp/models/product_model.dart';
 import 'package:user_shoppingapp/provider/cart_provider.dart';
 import 'package:user_shoppingapp/provider/wishlist_provider.dart';
-
 import 'package:user_shoppingapp/utils/constants/discount.dart';
-import 'package:user_shoppingapp/widgets/wishlist_dialog.dart';
+import 'package:user_shoppingapp/widgets/common_appbar.dart';
 
 class ViewProduct extends StatefulWidget {
   const ViewProduct({super.key});
@@ -27,12 +26,11 @@ class _ViewProductState extends State<ViewProduct> {
     super.dispose();
   }
 
-  // Image indicator widget
   Widget _buildImageIndicator(int index, int currentIndex, int total) {
     return Container(
       width: 8,
       height: 8,
-      margin: EdgeInsets.symmetric(horizontal: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: currentIndex == index ? Colors.blue : Colors.grey.shade300,
@@ -46,43 +44,14 @@ class _ViewProductState extends State<ViewProduct> {
     final List<String> displayImages = product.images.isEmpty ? [product.image] : product.images;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Product Details"),
-        scrolledUnderElevation: 0,
-        forceMaterialTransparency: true,
-        actions: [
-         Consumer<WishlistProvider>(
-  builder: (context, wishlistProvider, child) {
-    return IconButton(
-      icon: Icon(
-        wishlistProvider.isWishlisted(product.id)
-            ? Icons.favorite
-            : Icons.favorite_border,
-        color: wishlistProvider.isWishlisted(product.id)
-            ? Colors.red
-            : null,
-      ),
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) => WishlistSelectionDialog(
-            productId: product.id,
-          ),
-        );
-      },
-    );
-  },
-)
-        ],
-      ),
+      appBar: GlobalAppBar(title: "Produxt Details"),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Carousel
             Stack(
-              alignment: Alignment.bottomCenter,
               children: [
+                // Image Carousel
                 SizedBox(
                   height: 300,
                   child: PageView.builder(
@@ -101,10 +70,55 @@ class _ViewProductState extends State<ViewProduct> {
                     },
                   ),
                 ),
+                // Wishlist button
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: Consumer<WishlistProvider>(
+                    builder: (context, wishlistProvider, _) {
+                      final isWishlisted = wishlistProvider.isWishlisted(product.id);
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 1,
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            isWishlisted ? Icons.favorite : Icons.favorite_border,
+                            color: isWishlisted ? Colors.red : Colors.grey,
+                            size: 28,
+                          ),
+                          onPressed: () {
+                            wishlistProvider.toggleWishlist(product.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  isWishlisted
+                                      ? "Removed from wishlist"
+                                      : "Added to wishlist",
+                                ),
+                                duration: const Duration(seconds: 1),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
                 // Image indicators
                 if (displayImages.length > 1)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
+                  Positioned(
+                    bottom: 16,
+                    left: 0,
+                    right: 0,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(

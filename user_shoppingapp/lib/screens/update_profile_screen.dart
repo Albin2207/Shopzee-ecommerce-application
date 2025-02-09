@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:user_shoppingapp/controllers/database_service.dart';
 import 'package:user_shoppingapp/provider/user_provider.dart';
+import 'package:user_shoppingapp/widgets/common_appbar.dart';
 
 class UpdateProfile extends StatefulWidget {
   const UpdateProfile({super.key});
@@ -42,11 +43,7 @@ final TextEditingController _roadNameController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Update Profile"),
-        scrolledUnderElevation: 0,
-        forceMaterialTransparency: true,
-      ),
+      appBar: GlobalAppBar(title: "Update Profile"),
       body: SingleChildScrollView(
         child: Form(
           key: formKey,

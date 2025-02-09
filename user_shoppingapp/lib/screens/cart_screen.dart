@@ -23,7 +23,7 @@ class _CartPageState extends State<CartPage> {
           if (value.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          
+
           if (value.carts.isEmpty) {
             return const Center(child: Text("No items in cart"));
           }
@@ -33,7 +33,8 @@ class _CartPageState extends State<CartPage> {
             itemCount: value.carts.length,
             itemBuilder: (context, index) {
               // Safety check for index bounds
-              if (index >= value.products.length || index >= value.carts.length) {
+              if (index >= value.products.length ||
+                  index >= value.carts.length) {
                 return const SizedBox();
               }
 
@@ -41,17 +42,19 @@ class _CartPageState extends State<CartPage> {
               final product = value.products[index];
 
               return CartContainer(
-                image: product.images.isNotEmpty 
-                    ? product.images.first 
+                image: product.images.isNotEmpty
+                    ? product.images.first
                     : product.image,
                 name: product.name,
                 new_price: product.new_price,
                 old_price: product.old_price,
                 maxQuantity: product.maxQuantity,
                 selectedQuantity: cartItem.quantity,
+                productId: product.id,
                 selectedSize: cartItem.selectedSize,
                 selectedColor: cartItem.selectedColor,
-                productId: product.id,
+                availableSizes: product.sizes,
+                availableColors: product.colors,
               );
             },
           );
@@ -72,7 +75,8 @@ class _CartPageState extends State<CartPage> {
               children: [
                 Text(
                   "Total : ₹${value.totalCost}",
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 ElevatedButton(
                   onPressed: () {

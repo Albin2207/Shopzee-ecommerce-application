@@ -19,7 +19,7 @@ class _MainPageState extends State<MainPage> {
     const HomePage(),
     const CategoriesScreen(),
     const CartPage(),
-    const WishlistsPage(),
+    const WishlistPage(),
     const ProfileScreen(),
   ];
 

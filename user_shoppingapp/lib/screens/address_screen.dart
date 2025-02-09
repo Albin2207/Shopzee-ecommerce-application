@@ -5,6 +5,7 @@ import 'package:user_shoppingapp/controllers/database_service.dart';
 import 'package:user_shoppingapp/models/address_model.dart';
 import 'package:user_shoppingapp/provider/address_provider.dart';
 import 'package:user_shoppingapp/screens/add_addess_screen.dart';
+import 'package:user_shoppingapp/widgets/common_appbar.dart';
 
 class AddressesPage extends StatelessWidget {
   const AddressesPage({super.key});
@@ -21,11 +22,7 @@ class AddressesPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Select Address'),
-        scrolledUnderElevation: 0,
-        forceMaterialTransparency: true,
-      ),
+      appBar: GlobalAppBar(title: "Address List"),
       body: Column(
         children: [
           Expanded(

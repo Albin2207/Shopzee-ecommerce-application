@@ -27,6 +27,7 @@ import 'package:user_shoppingapp/screens/splash_screen.dart';
 import 'package:user_shoppingapp/screens/update_profile_screen.dart';
 import 'package:user_shoppingapp/screens/view_products_screen.dart';
 import 'package:user_shoppingapp/screens/wishlist_screen.dart';
+
 import 'package:user_shoppingapp/widgets/bottom_navigationbar.dart';
 
 void main() async {
@@ -56,9 +57,7 @@ class App extends StatelessWidget {
           create: (context) => CartProvider(),
         ),
         ChangeNotifierProvider(create: (_) => FilterProvider()),
-        ChangeNotifierProvider(
-          create: (_) => WishlistProvider()..loadAllWishlists(),
-        ),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => SelectedAddressProvider()),
       ],
       child: MaterialApp(
@@ -80,8 +79,7 @@ class App extends StatelessWidget {
           "/view_product": (context) => ViewProduct(),
           "/search_screen": (context) => SearchResultsScreen(),
           "/cart": (context) => CartPage(),
-          "/wishlist": (context) => WishlistsPage(),
-          "/wishlist_items": (context) => WishlistItemsPage(),
+          "/wishlist": (context) => WishlistPage(),
           "/categories": (context) => CategoriesScreen(),
           "/discount": (context) => DiscountPage(),
           "/checkout": (context) => CheckoutPage(),

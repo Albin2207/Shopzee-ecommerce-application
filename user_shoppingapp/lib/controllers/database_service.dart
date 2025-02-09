@@ -249,41 +249,63 @@ class DbService {
   }
 
   // adding product to the cart
-  Future addToCart({required CartModel cartData}) async {
-    try {
-      // update
-      await FirebaseFirestore.instance
-          .collection("shop_users")
-          .doc(user!.uid)
-          .collection("cart")
-          .doc(cartData.productId)
-          .update({
-        "product_id": cartData.productId,
-        "quantity": FieldValue.increment(1)
-      });
-    } on FirebaseException catch (e) {
-      print("firebase exception : ${e.code}");
-      if (e.code == "not-found") {
-        // insert
-        await FirebaseFirestore.instance
-            .collection("shop_users")
-            .doc(user!.uid)
-            .collection("cart")
-            .doc(cartData.productId)
-            .set({"product_id": cartData.productId, "quantity": 1});
-      }
-    }
-  }
+ Future addToCart({required CartModel cartData}) async {
+  try {
+    String cartItemId = "${cartData.productId}_${cartData.selectedSize ?? ''}_${cartData.selectedColor ?? ''}";
 
-  // delete specific product from cart
-  Future deleteItemFromCart({required String productId}) async {
-    await FirebaseFirestore.instance
+    var docRef = FirebaseFirestore.instance
         .collection("shop_users")
         .doc(user!.uid)
         .collection("cart")
-        .doc(productId)
-        .delete();
+        .doc(cartItemId);
+
+    var doc = await docRef.get();
+    if (doc.exists) {
+      await docRef.update({
+        "quantity": FieldValue.increment(1),
+      });
+    } else {
+      await docRef.set({
+        "product_id": cartData.productId,
+        "quantity": cartData.quantity,
+        "selected_size": cartData.selectedSize,
+        "selected_color": cartData.selectedColor,
+      });
+    }
+  } on FirebaseException catch (e) {
+    print("firebase exception : ${e.code}");
   }
+}
+
+
+
+  // delete specific product from cart
+Future deleteItemFromCart({
+  required String productId,
+  String? size,
+  String? color,
+}) async {
+  var query = FirebaseFirestore.instance
+      .collection("shop_users")
+      .doc(user!.uid)
+      .collection("cart")
+      .where("product_id", isEqualTo: productId);
+
+  if (size != null) {
+    query = query.where("selected_size", isEqualTo: size);
+  }
+
+  if (color != null) {
+    query = query.where("selected_color", isEqualTo: color);
+  }
+
+  var snapshot = await query.get();
+  for (var doc in snapshot.docs) {
+    await doc.reference.delete();
+  }
+}
+
+
 
   // empty users cart
   Future emptyCart() async {
@@ -300,14 +322,56 @@ class DbService {
   }
 
   // decrease count of item
-  Future decreaseCount({required String productId}) async {
-    await FirebaseFirestore.instance
-        .collection("shop_users")
-        .doc(user!.uid)
-        .collection("cart")
-        .doc(productId)
-        .update({"quantity": FieldValue.increment(-1)});
+  Future decreaseCount({required String productId, String? size, String? color}) async {
+  String cartItemId = "${productId}_${size ?? ''}_${color ?? ''}";
+
+  var docRef = FirebaseFirestore.instance
+      .collection("shop_users")
+      .doc(user!.uid)
+      .collection("cart")
+      .doc(cartItemId);
+
+  var doc = await docRef.get();
+  if (doc.exists && doc["quantity"] > 1) {
+    await docRef.update({"quantity": FieldValue.increment(-1)});
+  } else {
+    await docRef.delete();
   }
+}
+
+Future updateCartQuantity(String productId, int quantity, {String? size, String? color}) async {
+  var query = FirebaseFirestore.instance
+      .collection("shop_users")
+      .doc(user!.uid)
+      .collection("cart")
+      .where("product_id", isEqualTo: productId);
+
+  if (size != null) {
+    query = query.where("selected_size", isEqualTo: size);
+  }
+
+  if (color != null) {
+    query = query.where("selected_color", isEqualTo: color);
+  }
+
+  var snapshot = await query.get();
+  for (var doc in snapshot.docs) {
+    await doc.reference.update({"quantity": quantity});
+  }
+}
+
+
+  Future<void> updateVariants(String productId, {String? size, String? color}) async {
+  final docRef = FirebaseFirestore.instance
+      .collection("shop_users")
+      .doc(user!.uid)
+      .collection("cart")
+      .doc(productId);
+  final updates = <String, dynamic>{};
+  if (size != null) updates['selected_size'] = size;
+  if (color != null) updates['selected_color'] = color;
+  await docRef.update(updates);
+}
   
   // ORDERS
   Future createOrder({required Map<String, dynamic> data}) async {
@@ -330,17 +394,9 @@ class DbService {
         .snapshots();
   }
 
-  // WISHLIST FUNCTIONS - EXISTING
-  Stream<QuerySnapshot> readWishlist() {
-    return FirebaseFirestore.instance
-        .collection("shop_users")
-        .doc(user!.uid)
-        .collection("wishlist")
-        .orderBy("added_at", descending: true)
-        .snapshots();
-  }
-
-  Future addToWishlist({required String productId}) async {
+  // WISHLIST FUNCTIONS 
+  Future<void> addToWishlist({required String productId}) async {
+    if (user == null) return; // Prevent errors if user is not logged in
     try {
       await FirebaseFirestore.instance
           .collection("shop_users")
@@ -357,7 +413,8 @@ class DbService {
     }
   }
 
-  Future removeFromWishlist({required String productId}) async {
+  Future<void> removeFromWishlist({required String productId}) async {
+    if (user == null) return;
     try {
       await FirebaseFirestore.instance
           .collection("shop_users")
@@ -371,7 +428,18 @@ class DbService {
     }
   }
 
+  Stream<QuerySnapshot> readWishlist() {
+    if (user == null) return const Stream.empty();
+    return FirebaseFirestore.instance
+        .collection("shop_users")
+        .doc(user!.uid)
+        .collection("wishlist")
+        .orderBy("added_at", descending: true)
+        .snapshots();
+  }
+
   Future<List<String>> getWishlistProductIds() async {
+    if (user == null) return [];
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection("shop_users")
@@ -382,161 +450,6 @@ class DbService {
     } catch (e) {
       print("Error getting wishlist IDs: $e");
       return [];
-    }
-  }
-
-  // NEW WISHLIST COLLECTION FUNCTIONS
-  Future createWishlistCollection({
-    required String name,
-    String? description,
-  }) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection("shop_users")
-          .doc(user!.uid)
-          .collection("wishlist_collections")
-          .add({
-        'name': name,
-        'description': description,
-        'created_at': FieldValue.serverTimestamp(),
-      });
-    } catch (e) {
-      print("Error creating wishlist collection: $e");
-      rethrow;
-    }
-  }
-
-  Stream<QuerySnapshot> readWishlistCollections() {
-    return FirebaseFirestore.instance
-        .collection("shop_users")
-        .doc(user!.uid)
-        .collection("wishlist_collections")
-        .orderBy("created_at", descending: true)
-        .snapshots();
-  }
-
-  Stream<QuerySnapshot> readWishlistCollectionItems(String collectionId) {
-    final collection = collectionId == 'default'
-        ? 'wishlist'
-        : 'wishlist_collections/$collectionId/items';
-
-    return FirebaseFirestore.instance
-        .collection("shop_users")
-        .doc(user!.uid)
-        .collection(collection)
-        .orderBy("added_at", descending: true)
-        .snapshots();
-  }
-
-  Future<void> addToWishlistCollection({
-    required String productId,
-    required String collectionId,
-  }) async {
-    try {
-      final userDoc =
-          FirebaseFirestore.instance.collection("shop_users").doc(user!.uid);
-
-      final collectionRef = collectionId == 'default'
-          ? userDoc.collection('wishlist')
-          : userDoc
-              .collection('wishlist_collections')
-              .doc(collectionId)
-              .collection('items');
-
-      await collectionRef.doc(productId).set({
-        'product_id': productId,
-        'added_at': FieldValue.serverTimestamp(),
-      });
-    } catch (e) {
-      print("Error adding to wishlist collection: $e");
-      rethrow;
-    }
-  }
-
-  Future<void> removeFromWishlistCollection({
-    required String productId,
-    required String collectionId,
-  }) async {
-    try {
-      final userDoc =
-          FirebaseFirestore.instance.collection("shop_users").doc(user!.uid);
-
-      final collectionRef = collectionId == 'default'
-          ? userDoc.collection('wishlist')
-          : userDoc
-              .collection('wishlist_collections')
-              .doc(collectionId)
-              .collection('items');
-
-      await collectionRef.doc(productId).delete();
-    } catch (e) {
-      print("Error removing from wishlist collection: $e");
-      rethrow;
-    }
-  }
-
-  Future deleteWishlistCollection(String collectionId) async {
-    try {
-      // First delete all items in the collection
-      final itemsSnapshot = await FirebaseFirestore.instance
-          .collection("shop_users")
-          .doc(user!.uid)
-          .collection("wishlist_collections")
-          .doc(collectionId)
-          .collection("items")
-          .get();
-
-      for (var doc in itemsSnapshot.docs) {
-        await doc.reference.delete();
-      }
-
-      // Then delete the collection itself
-      await FirebaseFirestore.instance
-          .collection("shop_users")
-          .doc(user!.uid)
-          .collection("wishlist_collections")
-          .doc(collectionId)
-          .delete();
-    } catch (e) {
-      print("Error deleting wishlist collection: $e");
-      rethrow;
-    }
-  }
-
-  Future moveToWishlist({
-    required String productId,
-    required String sourceCollectionId,
-    required String targetCollectionId,
-  }) async {
-    try {
-      // Get the item data from source collection
-      final sourceCollection = sourceCollectionId == 'default'
-          ? 'wishlist'
-          : 'wishlist_collections/$sourceCollectionId/items';
-
-      final itemDoc = await FirebaseFirestore.instance
-          .collection("shop_users")
-          .doc(user!.uid)
-          .collection(sourceCollection)
-          .doc(productId)
-          .get();
-
-      if (itemDoc.exists) {
-        // Add to target collection
-        await addToWishlistCollection(
-          productId: productId,
-          collectionId: targetCollectionId,
-        );
-
-        // Remove from source collection
-        await removeFromWishlistCollection(
-          productId: productId,
-          collectionId: sourceCollectionId,
-        );
-      }
-    } catch (e) {
-      print("Error moving item between wishlists: $e");
-      rethrow;
     }
   }
 }

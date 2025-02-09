@@ -3,7 +3,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:user_shoppingapp/controllers/database_service.dart';
 import 'package:user_shoppingapp/models/address_model.dart';
-import 'package:user_shoppingapp/utils/constants/app_permission.dart';
+import 'package:user_shoppingapp/utils/constants/location_permission.dart';
 
 class AddAddressPage extends StatefulWidget {
   final AddressModel? addressToEdit;
