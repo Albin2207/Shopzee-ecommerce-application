@@ -8,6 +8,7 @@ import 'package:user_shoppingapp/provider/address_provider.dart';
 import 'package:user_shoppingapp/provider/cart_provider.dart';
 import 'package:user_shoppingapp/provider/user_provider.dart';
 import 'package:user_shoppingapp/screens/address_screen.dart';
+import 'package:user_shoppingapp/screens/order_success_screen.dart';
 import 'package:user_shoppingapp/utils/constants/payment.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -29,7 +30,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Future<void> initPaymentSheet(int cost) async {
     try {
-      final selectedAddressProvider = Provider.of<SelectedAddressProvider>(context, listen: false);
+      final selectedAddressProvider =
+          Provider.of<SelectedAddressProvider>(context, listen: false);
       final user = Provider.of<UserProvider>(context, listen: false);
       final deliveryAddress = selectedAddressProvider.getDeliveryAddress(user);
 
@@ -66,7 +68,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Checkout", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+        title: const Text("Checkout",
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
         scrolledUnderElevation: 0,
         forceMaterialTransparency: true,
       ),
@@ -79,12 +82,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Delivery Details", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-                    
+                    const Text("Delivery Details",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500)),
                     Consumer<SelectedAddressProvider>(
                       builder: (context, addressProvider, _) {
-                        final user = Provider.of<UserProvider>(context, listen: false);
-                        final deliveryAddress = addressProvider.getDeliveryAddress(user);
+                        final user =
+                            Provider.of<UserProvider>(context, listen: false);
+                        final deliveryAddress =
+                            addressProvider.getDeliveryAddress(user);
                         return Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
@@ -96,7 +102,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             children: [
                               Text(
                                 deliveryAddress['name']!,
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
                               ),
                               const SizedBox(height: 5),
                               Text(
@@ -111,7 +118,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   onPressed: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => const AddressesPage()),
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AddressesPage()),
                                     );
                                   },
                                   child: const Text("Change Address"),
@@ -122,9 +131,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         );
                       },
                     ),
-
                     const SizedBox(height: 20),
-                    
                     Text("Have a coupon?"),
                     Row(
                       children: [
@@ -145,12 +152,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         TextButton(
                           onPressed: () async {
                             QuerySnapshot querySnapshot = await DbService()
-                                .verifyDiscount(code: _couponController.text.toUpperCase());
+                                .verifyDiscount(
+                                    code: _couponController.text.toUpperCase());
 
                             if (querySnapshot.docs.isNotEmpty) {
-                              QueryDocumentSnapshot doc = querySnapshot.docs.first;
+                              QueryDocumentSnapshot doc =
+                                  querySnapshot.docs.first;
                               int percent = doc.get('discount');
-                              discountText = "a discount of $percent% has been applied.";
+                              discountText =
+                                  "a discount of $percent% has been applied.";
                               discountCalculator(percent, cartData.totalCost);
                             } else {
                               discountText = "No discount code found";
@@ -163,17 +173,20 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                     SizedBox(height: 8),
                     discountText.isEmpty ? Container() : Text(discountText),
-
                     const SizedBox(height: 20),
                     const Divider(),
-
-                    Text("Total Quantity of Products: ${cartData.totalQuantity}", style: const TextStyle(fontSize: 16)),
-                    Text("Sub Total: ₹ ${cartData.totalCost}", style: const TextStyle(fontSize: 16)),
-
+                    Text(
+                        "Total Quantity of Products: ${cartData.totalQuantity}",
+                        style: const TextStyle(fontSize: 16)),
+                    Text("Sub Total: ₹ ${cartData.totalCost}",
+                        style: const TextStyle(fontSize: 16)),
                     const Divider(),
-                    Text("Extra Discount: - ₹ $discount", style: const TextStyle(fontSize: 16)),
+                    Text("Extra Discount: - ₹ $discount",
+                        style: const TextStyle(fontSize: 16)),
                     const Divider(),
-                    Text("Total Payable: ₹ ${cartData.totalCost - discount}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                    Text("Total Payable: ₹ ${cartData.totalCost - discount}",
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500)),
                   ],
                 ),
               );
@@ -181,7 +194,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
         ),
       ),
-
       bottomNavigationBar: Consumer<SelectedAddressProvider>(
         builder: (context, addressProvider, _) {
           return Container(
@@ -190,14 +202,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
             child: ElevatedButton(
               onPressed: () async {
                 final user = Provider.of<UserProvider>(context, listen: false);
-                final deliveryAddress = addressProvider.getDeliveryAddress(user);
+                final deliveryAddress =
+                    addressProvider.getDeliveryAddress(user);
                 final cart = Provider.of<CartProvider>(context, listen: false);
 
                 await initPaymentSheet(cart.totalCost - discount);
 
                 try {
                   await Stripe.instance.presentPaymentSheet();
-                  
+
                   List products = cart.products.asMap().entries.map((entry) {
                     int i = entry.key;
                     var product = entry.value;
@@ -234,19 +247,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   await DbService().emptyCart();
 
                   if (mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Payment Done", style: TextStyle(color: Colors.white)),
-                        backgroundColor: Colors.green,
-                      ),
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const OrderSuccessScreen()),
                     );
                   }
                 } catch (e) {
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text("Payment Failed", style: TextStyle(color: Colors.white)),
+                        content: Text("Payment Failed",
+                            style: TextStyle(color: Colors.white)),
                         backgroundColor: Colors.redAccent,
                       ),
                     );

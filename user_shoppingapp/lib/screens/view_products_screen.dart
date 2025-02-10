@@ -53,7 +53,7 @@ class _ViewProductState extends State<ViewProduct> {
               children: [
                 // Image Carousel
                 SizedBox(
-                  height: 300,
+                  height: 500,
                   child: PageView.builder(
                     controller: _pageController,
                     onPageChanged: (index) {

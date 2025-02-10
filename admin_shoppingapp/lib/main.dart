@@ -11,6 +11,7 @@ import 'package:admin_shoppingapp/views/modify_promo.dart';
 import 'package:admin_shoppingapp/views/orders_list.dart';
 import 'package:admin_shoppingapp/views/products_page.dart';
 import 'package:admin_shoppingapp/views/promo_banners_page.dart';
+import 'package:admin_shoppingapp/views/statistics_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -55,7 +56,8 @@ class MyApp extends StatelessWidget {
           "/update_promo": (context) => ModifyPromo(),
           "/coupons": (context) => CouponsPage(),
           "/orders": (context) => OrdersPage(),
-          "/view_order": (context) => ViewOrder()
+          "/view_order": (context) => ViewOrder(),
+          "/analytics": (context) => AnalyticsPage()
         },
       ),
     );

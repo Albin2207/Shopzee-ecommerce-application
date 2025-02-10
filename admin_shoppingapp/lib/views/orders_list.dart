@@ -1,9 +1,11 @@
 import 'package:admin_shoppingapp/models/orders_model.dart';
 import 'package:admin_shoppingapp/providers/admin_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
 import '../controllers/db_service.dart';
+import 'package:timeago/timeago.dart' as timeago;
+
 
 class OrdersPage extends StatefulWidget {
   const OrdersPage({super.key});
@@ -65,8 +67,7 @@ class _OrdersPageState extends State<OrdersPage> {
       ),
       body: Consumer<AdminProvider>(
         builder: (context, value, child) {
-          List<OrdersModel> orders =
-              OrdersModel.fromJsonList(value.orders);
+          List<OrdersModel> orders = OrdersModel.fromJsonList(value.orders);
 
           if (orders.isEmpty) {
             return Center(
@@ -83,7 +84,9 @@ class _OrdersPageState extends State<OrdersPage> {
                   },
                   title: Text("Order by ${orders[index].name} "),
                   subtitle: Text(
-                      "Ordered on ${DateTime.fromMillisecondsSinceEpoch(orders[index].created_at).toString()}"),
+                    "Ordered on ${DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.fromMillisecondsSinceEpoch(orders[index].created_at))} "
+                    "(${timeago.format(DateTime.fromMillisecondsSinceEpoch(orders[index].created_at))})",
+                  ),
                   trailing: statusIcon(orders[index].status),
                 );
               },
@@ -158,7 +161,23 @@ class _ViewOrderState extends State<ViewOrder> {
                                   SizedBox(
                                     height: 50,
                                     width: 50,
-                                    child: Image.network(e.image),
+                                    child: e.images.isNotEmpty
+                                        ? PageView.builder(
+                                            itemCount: e.images.length,
+                                            itemBuilder: (context, imgIndex) {
+                                              return Image.network(
+                                                e.images[imgIndex],
+                                                errorBuilder: (context, error,
+                                                        stackTrace) =>
+                                                    Icon(
+                                                        Icons
+                                                            .image_not_supported,
+                                                        size: 50),
+                                              );
+                                            },
+                                          )
+                                        : Icon(Icons.image_not_supported,
+                                            size: 50),
                                   ),
                                   SizedBox(
                                     width: 10,

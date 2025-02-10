@@ -5,14 +5,9 @@ import 'package:user_shoppingapp/models/product_model.dart';
 import 'package:user_shoppingapp/utils/constants/discount.dart';
 import 'package:user_shoppingapp/provider/wishlist_provider.dart';
 
-class SpecificProducts extends StatefulWidget {
+class SpecificProducts extends StatelessWidget {
   const SpecificProducts({super.key});
 
-  @override
-  State<SpecificProducts> createState() => _SpecificProductsState();
-}
-
-class _SpecificProductsState extends State<SpecificProducts> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
@@ -71,19 +66,37 @@ class _SpecificProductsState extends State<SpecificProducts> {
                                     Stack(
                                       children: [
                                         SizedBox(
-                                          height: 150, // Fixed height instead of Expanded
+                                          height: 150, 
                                           width: double.infinity,
                                           child: Container(
                                             decoration: BoxDecoration(
                                               color: Colors.white,
                                               borderRadius: BorderRadius.circular(8),
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                  product.images.isNotEmpty
-                                                      ? product.images.first
-                                                      : product.image,
-                                                ),
-                                                fit: BoxFit.cover,
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(8),
+                                              child: Image.network(
+                                                product.images.isNotEmpty
+                                                    ? product.images.first
+                                                    : product.image,
+                                                fit: BoxFit.contain,
+                                                loadingBuilder: (context, child, loadingProgress) {
+                                                  if (loadingProgress == null) return child;
+                                                  return Container(
+                                                    color: Colors.grey[200],
+                                                    child: const Center(
+                                                      child: Icon(Icons.image, size: 50, color: Colors.grey),
+                                                    ),
+                                                  );
+                                                },
+                                                errorBuilder: (context, error, stackTrace) {
+                                                  return Container(
+                                                    color: Colors.grey[300],
+                                                    child: const Center(
+                                                      child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                                                    ),
+                                                  );
+                                                },
                                               ),
                                             ),
                                           ),

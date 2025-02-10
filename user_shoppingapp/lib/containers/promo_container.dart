@@ -5,7 +5,10 @@ import 'package:user_shoppingapp/controllers/database_service.dart';
 import 'package:user_shoppingapp/models/promo_banners_model.dart';
 
 class PromoContainer extends StatefulWidget {
-  const PromoContainer({super.key});
+  final double width; 
+  final double height; 
+
+  const PromoContainer({super.key, this.width = 700, this.height = 400});
 
   @override
   State<PromoContainer> createState() => _PromoContainerState();
@@ -41,6 +44,8 @@ class _PromoContainerState extends State<PromoContainer> {
                           );
                         },
                         child: Container(
+                          width: widget.width, // Use adjustable width
+                          height: widget.height, // Use adjustable height
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
@@ -56,7 +61,28 @@ class _PromoContainerState extends State<PromoContainer> {
                             borderRadius: BorderRadius.circular(12),
                             child: Image.network(
                               promo.image,
+                              width: widget.width,
+                              height: widget.height,
                               fit: BoxFit.cover,
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded /
+                                          (loadingProgress.expectedTotalBytes ?? 1)
+                                        : null,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Image.asset(
+                                  'assets/placeholder.png', // Provide a default placeholder
+                                  width: widget.width,
+                                  height: widget.height,
+                                  fit: BoxFit.cover,
+                                );
+                              },
                             ),
                           ),
                         ),
@@ -69,7 +95,7 @@ class _PromoContainerState extends State<PromoContainer> {
                   autoPlayInterval: const Duration(seconds: 5),
                   autoPlayAnimationDuration: Duration(milliseconds: 800),
                   autoPlayCurve: Curves.fastOutSlowIn,
-                  aspectRatio: 16 / 8,
+                  aspectRatio: widget.width / widget.height,
                   viewportFraction: 0.92,
                   enlargeCenterPage: true,
                   enlargeFactor: 0.3,
@@ -83,7 +109,8 @@ class _PromoContainerState extends State<PromoContainer> {
             baseColor: Colors.grey[300]!,
             highlightColor: Colors.grey[100]!,
             child: Container(
-              height: 200,
+              height: widget.height,
+              width: widget.width,
               margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.white,

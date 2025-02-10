@@ -83,11 +83,20 @@ class ProfileScreen extends StatelessWidget {
                   Navigator.pushNamed(context, "/discount");
                 },
               ),
+              const Divider(thickness: 1, endIndent: 10, indent: 10),
                Listtile(
-                title: 'Saved adddress',
+                title: 'Saved Address',
                 icon: Icons.discount_outlined,
                 onPress: () {
                   Navigator.pushNamed(context, "/address");
+                },
+              ),
+               const Divider(thickness: 1, endIndent: 10, indent: 10),
+               Listtile(
+                title: 'Terms, Policiees & Connditions',
+                icon: Icons.discount_outlined,
+                onPress: () {
+                  Navigator.pushNamed(context, "/terms_policies");
                 },
               ),
               const Divider(thickness: 1, endIndent: 10, indent: 10),

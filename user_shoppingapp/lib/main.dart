@@ -24,6 +24,7 @@ import 'package:user_shoppingapp/screens/search_screen.dart';
 import 'package:user_shoppingapp/screens/sigup_screen.dart';
 import 'package:user_shoppingapp/screens/specific_products_screen.dart';
 import 'package:user_shoppingapp/screens/splash_screen.dart';
+import 'package:user_shoppingapp/screens/terms_policies_screen.dart';
 import 'package:user_shoppingapp/screens/update_profile_screen.dart';
 import 'package:user_shoppingapp/screens/view_products_screen.dart';
 import 'package:user_shoppingapp/screens/wishlist_screen.dart';
@@ -87,6 +88,7 @@ class App extends StatelessWidget {
           "/view_order": (context) => ViewOrder(),
           "/address": (context) => AddressesPage(),
           "/add_address": (context) => AddAddressPage(),
+          "/terms_policies": (context) => TermsConditionsPrivacy()
         },
       ),
     );

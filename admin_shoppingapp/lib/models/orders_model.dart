@@ -21,21 +21,25 @@ class OrdersModel{
   });
 
   // convert json to object model
-  factory OrdersModel.fromJson(Map<String,dynamic> json,String id){
-    return OrdersModel(
-      id: id??"",
-      created_at: json["created_at"]??0,
-      email: json["email"]??"",
-      name: json["name"]??"",
-      phone: json["phone"]??"",
-      status: json["status"]??"",
-      address: json["address"]??"",
-      user_id: json["user_id"]??"",
-      discount: json["discount"]??0,
-      total: json["total"]??0,
-      products: List<OrderProductModel>.from(json["products"].map((e) => OrderProductModel.fromJson(e)))
-    );
-  }
+  factory OrdersModel.fromJson(Map<String, dynamic> json, String id) {
+  return OrdersModel(
+    id: id ?? "",
+    created_at: json["created_at"] ?? 0,
+    email: json["email"] ?? "",
+    name: json["name"] ?? "",
+    phone: json["phone"] ?? "",
+    status: json["status"] ?? "",
+    address: json["address"] ?? "",
+    user_id: json["user_id"] ?? "",
+    discount: json["discount"] ?? 0,
+    total: json["total"] ?? 0,
+    products: json["products"] != null
+        ? List<OrderProductModel>.from(
+            (json["products"] as List).map((e) => OrderProductModel.fromJson(e)))
+        : [], // If products is null, return an empty list
+  );
+}
+
 
 // Convert List<QueryDocumentSnapshot> to List<OrdersModel>
   static List<OrdersModel> fromJsonList(List<QueryDocumentSnapshot> list) {
@@ -43,22 +47,36 @@ class OrdersModel{
   }
 
 }
+class OrderProductModel {
+  String id, name;
+  List<String> images;
+  int quantity, single_price, total_price;
 
-class OrderProductModel{
-  String id,name,image;
-  int quantity,single_price,total_price;
+  OrderProductModel({
+    required this.id,
+    required this.name,
+    required this.images,
+    required this.quantity,
+    required this.single_price,
+    required this.total_price,
+  });
 
-   OrderProductModel({required this.id,required this.name,required this.image,required this.quantity,required this.single_price,required this.total_price});
+  factory OrderProductModel.fromJson(Map<String, dynamic> json) {
+    List<String> imageList = [];
 
-  //  convert json to object model
-  factory OrderProductModel.fromJson(Map<String,dynamic> json){
+    if (json["images"] != null && (json["images"] as List).isNotEmpty) {
+      imageList = List<String>.from(json["images"]);
+    } else if (json["image"] != null && json["image"].isNotEmpty) {
+      imageList = [json["image"]];
+    }
+
     return OrderProductModel(
-      id: json["id"]??"",
-      name: json["name"]??"",
-      image: json["image"]??"",
-      quantity: json["quantity"]??0,
-      single_price: json["single_price"]??0,
-      total_price: json["total_price"]??0
+      id: json["id"] ?? "",
+      name: json["name"] ?? "",
+      images: imageList,
+      quantity: json["quantity"] ?? 0,
+      single_price: json["single_price"] ?? 0,
+      total_price: json["total_price"] ?? 0,
     );
   }
 }

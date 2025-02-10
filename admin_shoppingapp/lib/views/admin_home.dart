@@ -255,6 +255,18 @@ class _AdminHomeState extends State<AdminHome>
             ),
           ],
         ),
+         Row(
+          children: [
+            Expanded(
+              child: HomeButton(
+                name: "Admin Analytics",
+                icon: Icons.category,
+                onTap: () => Navigator.pushNamed(context, "/analytics"),
+              ),
+            ),
+            
+          ],
+        ),
       ],
     );
   }

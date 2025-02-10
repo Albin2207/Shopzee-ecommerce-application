@@ -37,13 +37,13 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   http: ^1.2.1
-  intl: ^0.20.1
+  intl: ^0.20.2
   logger: ^2.2.0
   url_launcher: ^6.2.6
   flutter_native_splash: ^2.4.0
   smooth_page_indicator: ^1.1.0
   connectivity_plus: ^6.0.3
-  lottie: ^3.1.0 
+  lottie: ^3.3.1 
   iconsax: ^0.0.8
   get: ^4.6.6
   get_storage: ^2.1.1
@@ -71,6 +71,7 @@ dependencies:
   geolocator: ^13.0.2
   geocoding: ^3.0.0
   permission_handler: ^11.3.1
+  timeago: ^3.2.2
 
   
 
@@ -101,16 +102,13 @@ flutter:
     - assets/images/banners/banner_2.jpg
     - assets/images/banners/banner_6.jpg
     - assets/images/banners/banner_3.jpg
-    - assets/images/products/user_img.jpg
     - assets/images/banners/
-    - assets/images/products/
     - assets/images/animations/
-    - assets/icons/categories/
     - assets/images/on_boarding_images/sammy-line-searching.gif
     - assets/images/on_boarding_images/sammy-line-shopping.gif
     - assets/images/on_boarding_images/sammy-line-delivery.gif
     - assets/logos/t-store-splash-logo-black.png
-    - assets/images/products/acer_laptop_1.png
+    - assets/images/animations/order confirmed.json
     - .env
     
   #   - images/a_dot_ham.jpeg

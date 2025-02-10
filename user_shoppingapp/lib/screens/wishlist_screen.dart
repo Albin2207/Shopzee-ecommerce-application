@@ -8,7 +8,7 @@ import 'package:user_shoppingapp/provider/cart_provider.dart';
 import 'package:user_shoppingapp/provider/wishlist_provider.dart';
 
 class WishlistPage extends StatefulWidget {
-  const WishlistPage({Key? key}) : super(key: key);
+  const WishlistPage({super.key});
 
   @override
   State<WishlistPage> createState() => _WishlistPageState();
@@ -198,13 +198,13 @@ class _WishlistPageState extends State<WishlistPage> {
                       const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: () => Navigator.pushNamed(context, '/categories'),
-                        child: const Text("Start Shopping"),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 32,
                             vertical: 16,
                           ),
                         ),
+                        child: const Text("Start Shopping"),
                       ),
                     ],
                   ),
