@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:user_shoppingapp/screens/cart_screen.dart';
-import 'package:user_shoppingapp/screens/categories_screen.dart';
-import 'package:user_shoppingapp/screens/home_screen.dart';
-import 'package:user_shoppingapp/screens/profile_screen.dart';
-import 'package:user_shoppingapp/screens/wishlist_screen.dart';
+import 'package:user_shoppingapp/screens/cart/cart_screen.dart';
+import 'package:user_shoppingapp/screens/categories/categories_screen.dart';
+import 'package:user_shoppingapp/screens/search_screen.dart';
+import 'package:user_shoppingapp/screens/home_screen/home_screen.dart';
+import 'package:user_shoppingapp/screens/user_profile/profile_screen.dart';
+import 'package:user_shoppingapp/screens/wishlist/wishlist_screen.dart';
+
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -18,6 +20,7 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> _screens = [
     const HomePage(),
     const CategoriesScreen(),
+    const SearchPage(),
     const CartPage(),
     const WishlistPage(),
     const ProfileScreen(),
@@ -48,6 +51,10 @@ class _MainPageState extends State<MainPage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.category),
             label: 'Categories',
+          ),
+           BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Search',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),

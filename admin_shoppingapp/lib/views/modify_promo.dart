@@ -2,10 +2,11 @@ import 'dart:io';
 import 'package:admin_shoppingapp/controllers/cloudinary_service.dart';
 import 'package:admin_shoppingapp/controllers/db_service.dart';
 import 'package:admin_shoppingapp/models/promo_banners_model.dart';
-import 'package:admin_shoppingapp/providers/admin_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+
+import '../providers/admin_provider.dart';
 
 class ModifyPromo extends StatefulWidget {
   const ModifyPromo({super.key});
@@ -21,7 +22,7 @@ class _ModifyPromoState extends State<ModifyPromo> {
   TextEditingController categoryController = TextEditingController();
   TextEditingController imageController = TextEditingController();
   final ImagePicker picker = ImagePicker();
-  late XFile? image;
+  late XFile? image = null;
 
   bool _isInitialized = false;
   bool _isPromo = true;
@@ -40,7 +41,7 @@ class _ModifyPromoState extends State<ModifyPromo> {
         _isInitialized = true;
       }
     });
-  } 
+  }
 
   // NEW : upload to cloudinary
   void _pickImageAndCloudinaryUpload() async {
@@ -50,13 +51,14 @@ class _ModifyPromoState extends State<ModifyPromo> {
       setState(() {
         if (res != null) {
           imageController.text = res;
-          print("set image url $res : ${imageController.text}");
+          print("set image url ${res} : ${imageController.text}");
           ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Image uploaded successfully")));
         }
       });
     }
   }
+
 
   // set the data from arguments
   setData(PromoBannersModel data) {
@@ -171,21 +173,24 @@ class _ModifyPromoState extends State<ModifyPromo> {
                         )),
                 ElevatedButton(
                     onPressed: () {
+                      // OLD one for firebase storage upload
+                      // pickImage();
+                      // NEW for cloudinary Upload
                       _pickImageAndCloudinaryUpload();
                     },
                     child: Text("Pick Image")),
                 SizedBox(
                   height: 10,
                 ),
-                // TextFormField(
-                //   controller: imageController,
-                //   validator: (v) => v!.isEmpty ? "This cant be empty." : null,
-                //   decoration: InputDecoration(
-                //       hintText: "Image Link",
-                //       label: Text("Image Link"),
-                //       fillColor: Colors.deepPurple.shade50,
-                //       filled: true),
-                // ),
+                TextFormField(
+                  controller: imageController,
+                  validator: (v) => v!.isEmpty ? "This cant be empty." : null,
+                  decoration: InputDecoration(
+                      hintText: "Image Link",
+                      label: Text("Image Link"),
+                      fillColor: Colors.deepPurple.shade50,
+                      filled: true),
+                ),
                 SizedBox(
                   height: 10,
                 ),

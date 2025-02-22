@@ -13,22 +13,24 @@ import 'package:user_shoppingapp/provider/user_provider.dart';
 import 'package:user_shoppingapp/provider/wishlist_provider.dart';
 import 'package:user_shoppingapp/screens/add_addess_screen.dart';
 import 'package:user_shoppingapp/screens/address_screen.dart';
-import 'package:user_shoppingapp/screens/cart_screen.dart';
-import 'package:user_shoppingapp/screens/categories_screen.dart';
-import 'package:user_shoppingapp/screens/checkout_screen.dart';
-import 'package:user_shoppingapp/screens/discount_screen.dart';
-import 'package:user_shoppingapp/screens/login_screen.dart';
-import 'package:user_shoppingapp/screens/onboarding_screen.dart';
-import 'package:user_shoppingapp/screens/orders_screen.dart';
-import 'package:user_shoppingapp/screens/search_screen.dart';
-import 'package:user_shoppingapp/screens/sigup_screen.dart';
-import 'package:user_shoppingapp/screens/specific_products_screen.dart';
+import 'package:user_shoppingapp/screens/cart/cart_screen.dart';
+import 'package:user_shoppingapp/screens/categories/categories_screen.dart';
+import 'package:user_shoppingapp/screens/checkout/checkout_screen.dart';
+import 'package:user_shoppingapp/screens/discount_screen/discount_screen.dart';
+import 'package:user_shoppingapp/screens/authentication/login_screen.dart';
+import 'package:user_shoppingapp/screens/onboarding_screen/onboarding_screen.dart';
+import 'package:user_shoppingapp/screens/orders_page/orders_screen.dart';
+import 'package:user_shoppingapp/screens/orders_page/view_order_screen.dart';
+import 'package:user_shoppingapp/screens/search/search_screen.dart';
+import 'package:user_shoppingapp/screens/authentication/sigup_screen.dart';
+import 'package:user_shoppingapp/screens/product_listing_page/specific_products_screen.dart';
 import 'package:user_shoppingapp/screens/splash_screen.dart';
-import 'package:user_shoppingapp/screens/terms_policies_screen.dart';
-import 'package:user_shoppingapp/screens/update_profile_screen.dart';
-import 'package:user_shoppingapp/screens/view_products_screen.dart';
-import 'package:user_shoppingapp/screens/wishlist_screen.dart';
-
+import 'package:user_shoppingapp/screens/terms&conditions/terms_policies_screen.dart';
+import 'package:user_shoppingapp/screens/update_user_profile/update_profile_screen.dart';
+import 'package:user_shoppingapp/screens/view_product/view_products_screen.dart';
+import 'package:user_shoppingapp/screens/view_product/widgets/provider.dart';
+import 'package:user_shoppingapp/screens/wishlist/widgets/provider.dart';
+import 'package:user_shoppingapp/screens/wishlist/wishlist_screen.dart';
 import 'package:user_shoppingapp/widgets/bottom_navigationbar.dart';
 
 void main() async {
@@ -60,6 +62,10 @@ class App extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FilterProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => SelectedAddressProvider()),
+         ChangeNotifierProvider(create: (_) => WishlistSelectionProvider()),
+         ChangeNotifierProvider(create: (_) => ViewProductProvider()),
+
+
       ],
       child: MaterialApp(
         title: "Shopzee",

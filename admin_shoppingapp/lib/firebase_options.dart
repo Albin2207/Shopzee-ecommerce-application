@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -63,6 +54,38 @@ class DefaultFirebaseOptions {
     messagingSenderId: '27359421590',
     projectId: 'shopzee-d1596',
     storageBucket: 'shopzee-d1596.firebasestorage.app',
+    androidClientId: '27359421590-at5ed4q0uqg2n0qb54vu2l6hvpg79m63.apps.googleusercontent.com',
+    iosClientId: '27359421590-b7ghfi1v463er47gjt0vg5ntr6tie8de.apps.googleusercontent.com',
     iosBundleId: 'com.example.adminShoppingapp',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCSzt75DewiJS5YYPja8qdxAhtlL7c90Pk',
+    appId: '1:27359421590:web:411490d80ed97a2b9f8eb7',
+    messagingSenderId: '27359421590',
+    projectId: 'shopzee-d1596',
+    authDomain: 'shopzee-d1596.firebaseapp.com',
+    storageBucket: 'shopzee-d1596.firebasestorage.app',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyB27o9fIsctfYLXWJ68Tu_41JBGcE-5P_E',
+    appId: '1:27359421590:ios:10d273b3f804b2dd9f8eb7',
+    messagingSenderId: '27359421590',
+    projectId: 'shopzee-d1596',
+    storageBucket: 'shopzee-d1596.firebasestorage.app',
+    androidClientId: '27359421590-at5ed4q0uqg2n0qb54vu2l6hvpg79m63.apps.googleusercontent.com',
+    iosClientId: '27359421590-b7ghfi1v463er47gjt0vg5ntr6tie8de.apps.googleusercontent.com',
+    iosBundleId: 'com.example.adminShoppingapp',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCSzt75DewiJS5YYPja8qdxAhtlL7c90Pk',
+    appId: '1:27359421590:web:de6fe3a7e61caca79f8eb7',
+    messagingSenderId: '27359421590',
+    projectId: 'shopzee-d1596',
+    authDomain: 'shopzee-d1596.firebaseapp.com',
+    storageBucket: 'shopzee-d1596.firebasestorage.app',
+  );
+
 }

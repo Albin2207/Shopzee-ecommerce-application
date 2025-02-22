@@ -12,7 +12,20 @@
           "package_name": "com.example.admin_shoppingapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "27359421590-igfp23hc1k5ad9b3tesjs88hbvnc913v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.admin_shoppingapp",
+            "certificate_hash": "77ef097642953518f042b97d1bbb37827a3b2967"
+          }
+        },
+        {
+          "client_id": "27359421590-vsd4plcpfdtg019ioq31m985r250ipj0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCaAyjbYp7V3fL1s-1qY_NjF-7DmP_-2U8"
@@ -20,7 +33,63 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "27359421590-vsd4plcpfdtg019ioq31m985r250ipj0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "27359421590-b7ghfi1v463er47gjt0vg5ntr6tie8de.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.adminShoppingapp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:27359421590:android:f15fb2d1e9d164dc9f8eb7",
+        "android_client_info": {
+          "package_name": "com.example.user_shoppingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "27359421590-at5ed4q0uqg2n0qb54vu2l6hvpg79m63.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.user_shoppingapp",
+            "certificate_hash": "77ef097642953518f042b97d1bbb37827a3b2967"
+          }
+        },
+        {
+          "client_id": "27359421590-vsd4plcpfdtg019ioq31m985r250ipj0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaAyjbYp7V3fL1s-1qY_NjF-7DmP_-2U8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "27359421590-vsd4plcpfdtg019ioq31m985r250ipj0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "27359421590-b7ghfi1v463er47gjt0vg5ntr6tie8de.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.adminShoppingapp"
+              }
+            }
+          ]
         }
       }
     }

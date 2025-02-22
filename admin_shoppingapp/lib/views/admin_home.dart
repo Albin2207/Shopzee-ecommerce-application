@@ -46,6 +46,10 @@ class _AdminHomeState extends State<AdminHome>
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final isTablet = screenWidth >= 600 && screenWidth < 1200;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -119,12 +123,12 @@ class _AdminHomeState extends State<AdminHome>
             child: SlideTransition(
               position: _slideAnimation,
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
                 child: Column(
                   children: [
-                    _buildStatsCard(context),
+                    _buildStatsCard(context, isMobile, isTablet),
                     const SizedBox(height: 20),
-                    _buildActionButtons(context),
+                    _buildActionButtons(context, isMobile, isTablet),
                   ],
                 ),
               ),
@@ -135,14 +139,14 @@ class _AdminHomeState extends State<AdminHome>
     );
   }
 
-  Widget _buildStatsCard(BuildContext context) {
+  Widget _buildStatsCard(BuildContext context, bool isMobile, bool isTablet) {
     return Card(
       elevation: 8,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.deepPurple.shade50, Colors.white],
@@ -190,81 +194,20 @@ class _AdminHomeState extends State<AdminHome>
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context, bool isMobile, bool isTablet) {
     return Column(
       children: [
-        Row(
+        Wrap(
+          spacing: 16,
+          runSpacing: 16,
           children: [
-            Expanded(
-              child: HomeButton(
-                name: "Orders",
-                icon: Icons.shopping_cart,
-                onTap: () => Navigator.pushNamed(context, "/orders"),
-              ),
-            ),
-            Expanded(
-              child: HomeButton(
-                name: "Products",
-                icon: Icons.inventory,
-                onTap: () => Navigator.pushNamed(context, "/products"),
-              ),
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: HomeButton(
-                name: "Promos",
-                icon: Icons.local_offer,
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  "/promos",
-                  arguments: {"promo": true},
-                ),
-              ),
-            ),
-            Expanded(
-              child: HomeButton(
-                name: "Banners",
-                icon: Icons.photo_library,
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  "/promos",
-                  arguments: {"promo": false},
-                ),
-              ),
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: HomeButton(
-                name: "Categories",
-                icon: Icons.category,
-                onTap: () => Navigator.pushNamed(context, "/category"),
-              ),
-            ),
-            Expanded(
-              child: HomeButton(
-                name: "Coupons",
-                icon: Icons.card_giftcard,
-                onTap: () => Navigator.pushNamed(context, "/coupons"),
-              ),
-            ),
-          ],
-        ),
-         Row(
-          children: [
-            Expanded(
-              child: HomeButton(
-                name: "Admin Analytics",
-                icon: Icons.category,
-                onTap: () => Navigator.pushNamed(context, "/analytics"),
-              ),
-            ),
-            
+            HomeButton(name: "Orders", icon: Icons.shopping_cart, onTap: () => Navigator.pushNamed(context, "/orders")),
+            HomeButton(name: "Products", icon: Icons.inventory, onTap: () => Navigator.pushNamed(context, "/products")),
+            HomeButton(name: "Promos", icon: Icons.local_offer, onTap: () => Navigator.pushNamed(context, "/promos", arguments: {"promo": true})),
+            HomeButton(name: "Banners", icon: Icons.photo_library, onTap: () => Navigator.pushNamed(context, "/promos", arguments: {"promo": false})),
+            HomeButton(name: "Categories", icon: Icons.category, onTap: () => Navigator.pushNamed(context, "/category")),
+            HomeButton(name: "Coupons", icon: Icons.card_giftcard, onTap: () => Navigator.pushNamed(context, "/coupons")),
+            HomeButton(name: "Admin Analytics", icon: Icons.analytics, onTap: () => Navigator.pushNamed(context, "/analytics")),
           ],
         ),
       ],

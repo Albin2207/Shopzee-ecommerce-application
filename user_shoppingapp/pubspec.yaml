@@ -110,6 +110,10 @@ flutter:
     - assets/logos/t-store-splash-logo-black.png
     - assets/images/animations/order confirmed.json
     - .env
+    - assets/images/user/flat-business-man-user-profile-avatar-icon-vector-4333097.jpg
+    - assets/images/banners/banner_1.jpg
+    - assets/percent-discount-adoption-statistics-offer.jpg
+    - assets/west.jpg
     
   #   - images/a_dot_ham.jpeg
 

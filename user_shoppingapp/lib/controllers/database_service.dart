@@ -413,21 +413,6 @@ Future updateCartQuantity(String productId, int quantity, {String? size, String?
     }
   }
 
-  Future<void> removeFromWishlist({required String productId}) async {
-    if (user == null) return;
-    try {
-      await FirebaseFirestore.instance
-          .collection("shop_users")
-          .doc(user!.uid)
-          .collection("wishlist")
-          .doc(productId)
-          .delete();
-    } catch (e) {
-      print("Error removing from wishlist: $e");
-      rethrow;
-    }
-  }
-
   Stream<QuerySnapshot> readWishlist() {
     if (user == null) return const Stream.empty();
     return FirebaseFirestore.instance
@@ -438,6 +423,27 @@ Future updateCartQuantity(String productId, int quantity, {String? size, String?
         .snapshots();
   }
 
+ 
+  Future<void> removeFromWishlist({required String productId}) async {
+    if (user == null) return;
+    try {
+      final docRef = FirebaseFirestore.instance
+          .collection("shop_users")
+          .doc(user!.uid)
+          .collection("wishlist")
+          .doc(productId);
+      
+      // Check if document exists before deleting
+      final doc = await docRef.get();
+      if (doc.exists) {
+        await docRef.delete();
+      }
+    } catch (e) {
+      print("Error removing from wishlist: $e");
+      rethrow;
+    }
+  }
+
   Future<List<String>> getWishlistProductIds() async {
     if (user == null) return [];
     try {
@@ -446,7 +452,9 @@ Future updateCartQuantity(String productId, int quantity, {String? size, String?
           .doc(user!.uid)
           .collection("wishlist")
           .get();
-      return snapshot.docs.map((doc) => doc.id).toList();
+      
+      // Use document IDs instead of data
+      return snapshot.docs.map((doc) => doc.get('product_id') as String).toList();
     } catch (e) {
       print("Error getting wishlist IDs: $e");
       return [];
