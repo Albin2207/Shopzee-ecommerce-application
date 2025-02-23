@@ -9,8 +9,8 @@ class SearchResultsGrid extends StatelessWidget {
   const SearchResultsGrid({
     required this.products,
     required this.filterProvider,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

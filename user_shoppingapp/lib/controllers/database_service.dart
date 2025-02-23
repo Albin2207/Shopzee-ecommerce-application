@@ -4,10 +4,17 @@ import 'package:user_shoppingapp/models/address_model.dart';
 import 'package:user_shoppingapp/models/cart_model.dart';
 
 class DbService {
-  User? user = FirebaseAuth.instance.currentUser;
+  User? get user => FirebaseAuth.instance.currentUser;
 
-  // USER DATA
-  Future saveUserData({required String name, required String email}) async {
+  bool get isUserLoggedIn => user != null; // Check if user is logged in
+
+  Future<void> saveUserData(
+      {required String name, required String email}) async {
+    if (!isUserLoggedIn) {
+      print("Error: No authenticated user found.");
+      return;
+    }
+
     try {
       Map<String, dynamic> data = {
         "name": name,
@@ -18,45 +25,71 @@ class DbService {
           .doc(user!.uid)
           .set(data);
     } catch (e) {
-      print("error on saving user data: $e");
+      print("Error on saving user data: $e");
     }
   }
 
-  Future updateUserData({required Map<String, dynamic> extraData}) async {
+  Future<Map<String, dynamic>?> updateUserData(
+      {required Map<String, dynamic> extraData}) async {
     try {
-      await FirebaseFirestore.instance
-          .collection("shop_users")
-          .doc(user!.uid)
-          .update({
-        "name": extraData["name"],
-        "email": extraData["email"],
-        "phone": extraData["phone"],
-        "alternatePhone": extraData["alternatePhone"],
-        "pincode": extraData["pincode"],
-        "state": extraData["state"],
-        "city": extraData["city"],
-        "houseNo": extraData["houseNo"],
-        "roadName": extraData["roadName"],
-        
-      });
+      print(
+          "🚀 Attempting to update user data: $extraData"); // Debugging - print the full data being saved
 
-      // Optionally fetch fresh data after update
+      await FirebaseFirestore.instance.collection("shop_users").doc(user!.uid).set(
+          extraData,
+          SetOptions(
+              merge:
+                  true)); // Use set() with merge to ensure all fields are added
+
+      print("✅ User data updated successfully!");
+
+      // Fetch updated data from Firestore to confirm the update
       final updatedDoc = await FirebaseFirestore.instance
           .collection("shop_users")
           .doc(user!.uid)
           .get();
-      return updatedDoc.data();
+
+      if (updatedDoc.exists) {
+        final data = updatedDoc.data();
+        print(
+            "📌 Updated user data from Firestore: $data"); // Debugging - print the updated document
+        return data;
+      } else {
+        print("⚠️ User document not found after update.");
+        return null;
+      }
     } catch (e) {
-      print("Error updating user data: $e");
-      rethrow;
+      print("❌ Error updating user data: $e");
+      return null;
     }
   }
 
-  Stream<DocumentSnapshot> readUserData() {
-    return FirebaseFirestore.instance
-        .collection("shop_users")
-        .doc(user!.uid)
-        .snapshots();
+//read user data
+  Future<Map<String, dynamic>?> readUserData() async {
+    var user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      print("Error: No authenticated user found.");
+      return null;
+    }
+
+    String uid = user.uid;
+    try {
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection("shop_users")
+          .doc(uid)
+          .get();
+
+      if (doc.exists) {
+        print("User data found: ${doc.data()}"); // Debug log
+        return doc.data() as Map<String, dynamic>;
+      } else {
+        print("No user data exists for UID: $uid");
+        return null;
+      }
+    } catch (e) {
+      print("Error reading user data: $e");
+      return null;
+    }
   }
 
   //Address list
@@ -69,10 +102,9 @@ class DbService {
 
   // Read all addresses
   Stream<List<AddressModel>> readAddresses() {
-    return _addressesCollection.snapshots().map((snapshot) =>
-        snapshot.docs
-            .map((doc) => AddressModel.fromJson(doc.data(), doc.id))
-            .toList());
+    return _addressesCollection.snapshots().map((snapshot) => snapshot.docs
+        .map((doc) => AddressModel.fromJson(doc.data(), doc.id))
+        .toList());
   }
 
   // Add new address
@@ -80,11 +112,11 @@ class DbService {
     try {
       // Create a new map with all the address data
       final Map<String, dynamic> finalAddressData = Map.from(addressData);
-      
+
       // If this is the first address, make it default
       final addresses = await _addressesCollection.get();
       finalAddressData['isDefault'] = addresses.docs.isEmpty;
-      
+
       // Add server timestamp
       finalAddressData['createdAt'] = FieldValue.serverTimestamp();
 
@@ -95,11 +127,12 @@ class DbService {
     }
   }
 
-  Future<void> updateAddress(String id, Map<String, dynamic> addressData) async {
+  Future<void> updateAddress(
+      String id, Map<String, dynamic> addressData) async {
     try {
       // Create a new map with all the address data
       final Map<String, dynamic> finalAddressData = Map.from(addressData);
-      
+
       // Make sure isDefault is a boolean
       if (finalAddressData.containsKey('isDefault')) {
         finalAddressData['isDefault'] = finalAddressData['isDefault'] as bool;
@@ -111,28 +144,26 @@ class DbService {
       rethrow;
     }
   }
-  
-
 
   // Delete address
   Future<void> deleteAddress(String id) async {
     try {
       final address = await _addressesCollection.doc(id).get();
-      
+
       // If deleting default address, make another address default
       if (address.data()?['isDefault'] == true) {
         final otherAddresses = await _addressesCollection
             .where(FieldPath.documentId, isNotEqualTo: id)
             .limit(1)
             .get();
-        
+
         if (otherAddresses.docs.isNotEmpty) {
           await _addressesCollection
               .doc(otherAddresses.docs.first.id)
               .update({'isDefault': true});
         }
       }
-      
+
       await _addressesCollection.doc(id).delete();
     } catch (e) {
       print("Error deleting address: $e");
@@ -144,16 +175,16 @@ class DbService {
   Future<void> setDefaultAddress(String id) async {
     try {
       final batch = FirebaseFirestore.instance.batch();
-      
+
       // Remove default status from all addresses
       final addresses = await _addressesCollection.get();
       for (var doc in addresses.docs) {
         batch.update(doc.reference, {'isDefault': false});
       }
-      
+
       // Set new default address
       batch.update(_addressesCollection.doc(id), {'isDefault': true});
-      
+
       await batch.commit();
     } catch (e) {
       print("Error setting default address: $e");
@@ -168,9 +199,9 @@ class DbService {
           .where('isDefault', isEqualTo: true)
           .limit(1)
           .get();
-      
+
       if (snapshot.docs.isEmpty) return null;
-      
+
       return AddressModel.fromJson(
         snapshot.docs.first.data(),
         snapshot.docs.first.id,
@@ -237,7 +268,7 @@ class DbService {
         .update({"quantity": FieldValue.increment(-quantity)});
   }
 
-   // CART
+  // CART
   // display the user cart
 
   Stream<QuerySnapshot> readUserCart() {
@@ -249,63 +280,60 @@ class DbService {
   }
 
   // adding product to the cart
- Future addToCart({required CartModel cartData}) async {
-  try {
-    String cartItemId = "${cartData.productId}_${cartData.selectedSize ?? ''}_${cartData.selectedColor ?? ''}";
+  Future addToCart({required CartModel cartData}) async {
+    try {
+      String cartItemId =
+          "${cartData.productId}_${cartData.selectedSize ?? ''}_${cartData.selectedColor ?? ''}";
 
-    var docRef = FirebaseFirestore.instance
+      var docRef = FirebaseFirestore.instance
+          .collection("shop_users")
+          .doc(user!.uid)
+          .collection("cart")
+          .doc(cartItemId);
+
+      var doc = await docRef.get();
+      if (doc.exists) {
+        await docRef.update({
+          "quantity": FieldValue.increment(1),
+        });
+      } else {
+        await docRef.set({
+          "product_id": cartData.productId,
+          "quantity": cartData.quantity,
+          "selected_size": cartData.selectedSize,
+          "selected_color": cartData.selectedColor,
+        });
+      }
+    } on FirebaseException catch (e) {
+      print("firebase exception : ${e.code}");
+    }
+  }
+
+  // delete specific product from cart
+  Future deleteItemFromCart({
+    required String productId,
+    String? size,
+    String? color,
+  }) async {
+    var query = FirebaseFirestore.instance
         .collection("shop_users")
         .doc(user!.uid)
         .collection("cart")
-        .doc(cartItemId);
+        .where("product_id", isEqualTo: productId);
 
-    var doc = await docRef.get();
-    if (doc.exists) {
-      await docRef.update({
-        "quantity": FieldValue.increment(1),
-      });
-    } else {
-      await docRef.set({
-        "product_id": cartData.productId,
-        "quantity": cartData.quantity,
-        "selected_size": cartData.selectedSize,
-        "selected_color": cartData.selectedColor,
-      });
+    if (size != null) {
+      query = query.where("selected_size", isEqualTo: size);
     }
-  } on FirebaseException catch (e) {
-    print("firebase exception : ${e.code}");
+
+    if (color != null) {
+      query = query.where("selected_color", isEqualTo: color);
+    }
+
+    var snapshot = await query.get();
+    for (var doc in snapshot.docs) {
+      await doc.reference.delete();
+    }
   }
-}
-
-
-
-  // delete specific product from cart
-Future deleteItemFromCart({
-  required String productId,
-  String? size,
-  String? color,
-}) async {
-  var query = FirebaseFirestore.instance
-      .collection("shop_users")
-      .doc(user!.uid)
-      .collection("cart")
-      .where("product_id", isEqualTo: productId);
-
-  if (size != null) {
-    query = query.where("selected_size", isEqualTo: size);
-  }
-
-  if (color != null) {
-    query = query.where("selected_color", isEqualTo: color);
-  }
-
-  var snapshot = await query.get();
-  for (var doc in snapshot.docs) {
-    await doc.reference.delete();
-  }
-}
-
-
 
   // empty users cart
   Future emptyCart() async {
@@ -322,57 +350,59 @@ Future deleteItemFromCart({
   }
 
   // decrease count of item
-  Future decreaseCount({required String productId, String? size, String? color}) async {
-  String cartItemId = "${productId}_${size ?? ''}_${color ?? ''}";
+  Future decreaseCount(
+      {required String productId, String? size, String? color}) async {
+    String cartItemId = "${productId}_${size ?? ''}_${color ?? ''}";
 
-  var docRef = FirebaseFirestore.instance
-      .collection("shop_users")
-      .doc(user!.uid)
-      .collection("cart")
-      .doc(cartItemId);
+    var docRef = FirebaseFirestore.instance
+        .collection("shop_users")
+        .doc(user!.uid)
+        .collection("cart")
+        .doc(cartItemId);
 
-  var doc = await docRef.get();
-  if (doc.exists && doc["quantity"] > 1) {
-    await docRef.update({"quantity": FieldValue.increment(-1)});
-  } else {
-    await docRef.delete();
-  }
-}
-
-Future updateCartQuantity(String productId, int quantity, {String? size, String? color}) async {
-  var query = FirebaseFirestore.instance
-      .collection("shop_users")
-      .doc(user!.uid)
-      .collection("cart")
-      .where("product_id", isEqualTo: productId);
-
-  if (size != null) {
-    query = query.where("selected_size", isEqualTo: size);
+    var doc = await docRef.get();
+    if (doc.exists && doc["quantity"] > 1) {
+      await docRef.update({"quantity": FieldValue.increment(-1)});
+    } else {
+      await docRef.delete();
+    }
   }
 
-  if (color != null) {
-    query = query.where("selected_color", isEqualTo: color);
+  Future updateCartQuantity(String productId, int quantity,
+      {String? size, String? color}) async {
+    var query = FirebaseFirestore.instance
+        .collection("shop_users")
+        .doc(user!.uid)
+        .collection("cart")
+        .where("product_id", isEqualTo: productId);
+
+    if (size != null) {
+      query = query.where("selected_size", isEqualTo: size);
+    }
+
+    if (color != null) {
+      query = query.where("selected_color", isEqualTo: color);
+    }
+
+    var snapshot = await query.get();
+    for (var doc in snapshot.docs) {
+      await doc.reference.update({"quantity": quantity});
+    }
   }
 
-  var snapshot = await query.get();
-  for (var doc in snapshot.docs) {
-    await doc.reference.update({"quantity": quantity});
+  Future<void> updateVariants(String productId,
+      {String? size, String? color}) async {
+    final docRef = FirebaseFirestore.instance
+        .collection("shop_users")
+        .doc(user!.uid)
+        .collection("cart")
+        .doc(productId);
+    final updates = <String, dynamic>{};
+    if (size != null) updates['selected_size'] = size;
+    if (color != null) updates['selected_color'] = color;
+    await docRef.update(updates);
   }
-}
 
-
-  Future<void> updateVariants(String productId, {String? size, String? color}) async {
-  final docRef = FirebaseFirestore.instance
-      .collection("shop_users")
-      .doc(user!.uid)
-      .collection("cart")
-      .doc(productId);
-  final updates = <String, dynamic>{};
-  if (size != null) updates['selected_size'] = size;
-  if (color != null) updates['selected_color'] = color;
-  await docRef.update(updates);
-}
-  
   // ORDERS
   Future createOrder({required Map<String, dynamic> data}) async {
     await FirebaseFirestore.instance.collection("shop_orders").add(data);
@@ -394,7 +424,7 @@ Future updateCartQuantity(String productId, int quantity, {String? size, String?
         .snapshots();
   }
 
-  // WISHLIST FUNCTIONS 
+  // WISHLIST FUNCTIONS
   Future<void> addToWishlist({required String productId}) async {
     if (user == null) return; // Prevent errors if user is not logged in
     try {
@@ -423,7 +453,6 @@ Future updateCartQuantity(String productId, int quantity, {String? size, String?
         .snapshots();
   }
 
- 
   Future<void> removeFromWishlist({required String productId}) async {
     if (user == null) return;
     try {
@@ -432,7 +461,7 @@ Future updateCartQuantity(String productId, int quantity, {String? size, String?
           .doc(user!.uid)
           .collection("wishlist")
           .doc(productId);
-      
+
       // Check if document exists before deleting
       final doc = await docRef.get();
       if (doc.exists) {
@@ -452,9 +481,11 @@ Future updateCartQuantity(String productId, int quantity, {String? size, String?
           .doc(user!.uid)
           .collection("wishlist")
           .get();
-      
+
       // Use document IDs instead of data
-      return snapshot.docs.map((doc) => doc.get('product_id') as String).toList();
+      return snapshot.docs
+          .map((doc) => doc.get('product_id') as String)
+          .toList();
     } catch (e) {
       print("Error getting wishlist IDs: $e");
       return [];

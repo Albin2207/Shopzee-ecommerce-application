@@ -34,22 +34,20 @@ class WhatsNewGrid extends StatelessWidget {
                 flex: 3,
                 child: AspectRatio(
                   aspectRatio: 0.6,
-                  child: Builder(
-                    builder: (context) => GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const FeaturedPage(),
-                          ),
-                        );
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.asset(
-                          "assets/west.jpg",
-                          fit: BoxFit.cover,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const FeaturedPage(),
                         ),
+                      );
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.asset(
+                        "assets/west.jpg",
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
@@ -58,21 +56,33 @@ class WhatsNewGrid extends StatelessWidget {
 
               const SizedBox(width: 16),
 
-              // Right Column with Image + Text
+              // Right Column with Two Text Boxes
               Expanded(
                 flex: 2,
                 child: Column(
                   children: [
-                    // Top Right Box (Replaced with Custom Image)
-                    AspectRatio(
-                      aspectRatio: 0.6,
+                  
+                    SizedBox(
+                      height: 210, 
                       child: GestureDetector(
                         onTap: () => Navigator.pushNamed(context, "/discount"),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            "assets/percent-discount-adoption-statistics-offer.jpg", 
-                            fit: BoxFit.cover,
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 228, 171, 84),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "Exclusive Discounts Coupons!",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -80,21 +90,26 @@ class WhatsNewGrid extends StatelessWidget {
 
                     const SizedBox(height: 16),
 
-                    // Bottom Right - Text Box
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.black87,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Text(
-                        "Exciting New Arrivals!",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                    // Bottom Right 
+                    SizedBox(
+                      height: 140, 
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            "Exciting New Arrivals!",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     ),

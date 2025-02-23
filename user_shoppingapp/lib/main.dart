@@ -116,23 +116,31 @@ class _CheckUserState extends State<CheckUser> {
   }
 
   Future<void> _checkFirstLaunch() async {
-    bool isFirstLaunch = await FirstLaunchCheck.isFirstLaunch();
+  bool isFirstLaunch = await FirstLaunchCheck.isFirstLaunch();
+  debugPrint("Is first launch: $isFirstLaunch");
+
+  if (!mounted) return;
+
+  await Future.delayed(Duration(milliseconds: 100)); // Small delay to ensure the provider is available
+
+  try {
+    // ignore: use_build_context_synchronously
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    await userProvider.initializeUser();
+    debugPrint("User logged in: ${userProvider.isLoggedIn}");
+
     if (mounted) {
-      if (isFirstLaunch) {
-        Navigator.pushReplacementNamed(context, "/onboarding");
+      if (userProvider.isLoggedIn) {
+        Navigator.pushReplacementNamed(context, "/home");
       } else {
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
-        await userProvider.initializeUser();
-        if (mounted) {
-          if (userProvider.isLoggedIn) {
-            Navigator.pushReplacementNamed(context, "/home");
-          } else {
-            Navigator.pushReplacementNamed(context, "/login");
-          }
-        }
+        Navigator.pushReplacementNamed(context, "/login");
       }
     }
+  } catch (e, stackTrace) {
+    debugPrint("Error in _checkFirstLaunch: $e\n$stackTrace");
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

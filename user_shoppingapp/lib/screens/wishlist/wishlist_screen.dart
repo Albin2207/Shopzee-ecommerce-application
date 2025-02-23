@@ -67,7 +67,13 @@ class WishlistPage extends StatelessWidget {
         child: Consumer2<WishlistProvider, WishlistSelectionProvider>(
           builder: (context, wishlistProvider, selectionProvider, _) {
             return AppBar(
-              title: const Text("My Wishlist"),
+              backgroundColor: Colors.blue,
+              title: const Text(
+                "My Wishlist",
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              centerTitle: true,
               actions: [
                 if (selectionProvider.isSelectionMode &&
                     selectionProvider.selectedProducts.isNotEmpty)

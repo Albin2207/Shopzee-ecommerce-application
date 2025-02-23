@@ -8,8 +8,8 @@ class ResultsCount extends StatelessWidget {
   const ResultsCount({
     required this.filteredCount,
     required this.searchProvider,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

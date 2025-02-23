@@ -4,13 +4,13 @@ import 'package:user_shoppingapp/models/product_model.dart';
 import 'package:user_shoppingapp/utils/constants/discount.dart';
 import 'package:user_shoppingapp/controllers/database_service.dart';
 
-class PopularItemsContainer extends StatelessWidget {
-  const PopularItemsContainer({super.key});
+class SpeicalItemsContainer extends StatelessWidget {
+  const SpeicalItemsContainer({super.key});
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: DbService().readProducts("popular items"),  
+      stream: DbService().readProducts("special offer"),  
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<ProductsModel> products = ProductsModel.fromJsonList(snapshot.data!.docs);
@@ -41,7 +41,7 @@ class PopularItemsContainer extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'POPULAR',
+                        'SPECIAL',
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
@@ -51,7 +51,7 @@ class PopularItemsContainer extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Light Up Your Life',
+                        'Buy What You Love, Love What You Buy',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.white.withOpacity(0.8),

@@ -9,7 +9,6 @@ class UserModel {
   final String houseNo;
   final String roadName;
 
-
   UserModel({
     required this.name,
     required this.email,
@@ -20,7 +19,6 @@ class UserModel {
     required this.city,
     required this.houseNo,
     required this.roadName,
-
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {

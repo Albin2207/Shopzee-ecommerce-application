@@ -138,15 +138,15 @@ class _CartContainerState extends State<CartContainer> {
                     SizedBox(width: 8),
                     IconButton(
                         onPressed: () async {
-                          increaseCount(widget.maxQuantity);
+                          decreaseCount();
                         },
-                        icon: Icon(Icons.add)),
+                        icon: Icon(Icons.remove)), // Decrease button first
                     Text("$count"),
                     IconButton(
                         onPressed: () async {
-                          decreaseCount();
+                          increaseCount(widget.maxQuantity);
                         },
-                        icon: Icon(Icons.remove)),
+                        icon: Icon(Icons.add)), // Increase button after
                     Spacer(),
                     Text("Total: ₹${widget.new_price * count}",
                         style:

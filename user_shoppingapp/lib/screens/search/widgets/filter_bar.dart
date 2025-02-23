@@ -4,7 +4,7 @@ import 'package:user_shoppingapp/provider/filter_provider.dart';
 class FilterStatusBar extends StatelessWidget {
   final FilterProvider filterProvider;
 
-  const FilterStatusBar({required this.filterProvider, Key? key}) : super(key: key);
+  const FilterStatusBar({required this.filterProvider, super.key});
 
   @override
   Widget build(BuildContext context) {

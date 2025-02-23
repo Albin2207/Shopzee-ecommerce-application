@@ -36,11 +36,16 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  void loadUserData() {
-    _userSubscription?.cancel();
-    _userSubscription = DbService().readUserData().listen((snapshot) {
-      final UserModel data =
-          UserModel.fromJson(snapshot.data() as Map<String, dynamic>);
+  Future<void> loadUserData() async {
+    try {
+      Map<String, dynamic>? userData = await DbService().readUserData();
+
+      if (userData == null) {
+        return;
+      }
+
+      final UserModel data = UserModel.fromJson(userData);
+
       name = data.name;
       email = data.email;
       phone = data.phone;
@@ -52,7 +57,10 @@ class UserProvider extends ChangeNotifier {
       roadName = data.roadName;
 
       notifyListeners();
-    });
+    } catch (e) {
+      // ignore: avoid_print
+      print("Error loading user data: $e");
+    }
   }
 
   Future<void> updateProfile({
@@ -65,7 +73,6 @@ class UserProvider extends ChangeNotifier {
     required String city,
     required String houseNo,
     required String roadName,
-
   }) async {
     final data = {
       "name": name,
@@ -77,7 +84,6 @@ class UserProvider extends ChangeNotifier {
       "city": city,
       "houseNo": houseNo,
       "roadName": roadName,
-
     };
     await DbService().updateUserData(extraData: data);
   }
@@ -98,4 +104,6 @@ class UserProvider extends ChangeNotifier {
     cancelProvider();
     super.dispose();
   }
+
+  refreshUserData() {}
 }

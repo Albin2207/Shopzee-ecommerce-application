@@ -31,6 +31,7 @@ class EnhancedSearchBar extends StatelessWidget {
             borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
+                // ignore: deprecated_member_use
                 color: Colors.grey.withOpacity(0.3),
                 blurRadius: 10,
                 offset: Offset(0, 3),
@@ -75,6 +76,7 @@ class EnhancedSearchBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(15),
                 boxShadow: [
                   BoxShadow(
+                    // ignore: deprecated_member_use
                     color: Colors.black.withOpacity(0.2),
                     blurRadius: 8,
                     offset: Offset(0, 2),
