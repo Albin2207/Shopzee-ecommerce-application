@@ -121,10 +121,14 @@ class _CheckUserState extends State<CheckUser> {
 
   if (!mounted) return;
 
-  await Future.delayed(Duration(milliseconds: 100)); // Small delay to ensure the provider is available
+  if (isFirstLaunch) {
+    Navigator.pushReplacementNamed(context, "/onboarding");
+    return; // Stop execution here to prevent further navigation
+  }
+   // Small delay to ensure the provider is available
+  await Future.delayed(Duration(milliseconds: 100));
 
   try {
-    // ignore: use_build_context_synchronously
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     await userProvider.initializeUser();
     debugPrint("User logged in: ${userProvider.isLoggedIn}");
@@ -140,6 +144,7 @@ class _CheckUserState extends State<CheckUser> {
     debugPrint("Error in _checkFirstLaunch: $e\n$stackTrace");
   }
 }
+
 
 
   @override

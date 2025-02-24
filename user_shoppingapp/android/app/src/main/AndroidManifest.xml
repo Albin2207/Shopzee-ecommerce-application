@@ -8,7 +8,7 @@
 <uses-feature android:name="android.hardware.location.gps"/>
 
     <application
-        android:label="user_shoppingapp"
+        android:label="Shopzee"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -37,31 +37,32 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<void> loadUserData() async {
-    try {
-      Map<String, dynamic>? userData = await DbService().readUserData();
+  try {
+    Map<String, dynamic>? userData = await DbService().readUserData();
 
-      if (userData == null) {
-        return;
-      }
-
-      final UserModel data = UserModel.fromJson(userData);
-
-      name = data.name;
-      email = data.email;
-      phone = data.phone;
-      alternatePhone = data.alternatePhone;
-      pincode = data.pincode;
-      state = data.state;
-      city = data.city;
-      houseNo = data.houseNo;
-      roadName = data.roadName;
-
-      notifyListeners();
-    } catch (e) {
-      // ignore: avoid_print
-      print("Error loading user data: $e");
+    if (userData == null) {
+      print("User data is null");
+      return; // Exit if there's no user data
     }
+
+    final UserModel data = UserModel.fromJson(userData);
+
+    name = data.name;
+    email = data.email;
+    phone = data.phone;
+    alternatePhone = data.alternatePhone;
+    pincode = data.pincode;
+    state = data.state;
+    city = data.city;
+    houseNo = data.houseNo;
+    roadName = data.roadName;
+
+    notifyListeners();
+  } catch (e) {
+    print("Error loading user data: $e");
   }
+}
+
 
   Future<void> updateProfile({
     required String name,

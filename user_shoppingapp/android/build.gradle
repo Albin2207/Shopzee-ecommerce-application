@@ -1,13 +1,15 @@
 buildscript {
-    ext.kotlin_version = '2.1.10'
-    ext.java_version = JavaVersion.VERSION_1_8 // Add this line
+  ext.kotlin_version = '2.1.0'  // Match the Stripe SDK version
+
+    ext.java_version = JavaVersion.VERSION_1_8 
+
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.5.2'
+        classpath 'com.android.tools.build:gradle:8.2.2' // Use latest stable version
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }

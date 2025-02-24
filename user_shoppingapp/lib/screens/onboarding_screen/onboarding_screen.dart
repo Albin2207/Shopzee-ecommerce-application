@@ -6,19 +6,19 @@ import 'package:user_shoppingapp/screens/onboarding_screen/widgets/onboarding_wi
 import 'package:user_shoppingapp/utils/constants/image_strings.dart';
 import 'package:user_shoppingapp/utils/constants/text_strings.dart';
 
-
 class OnboardingProvider extends ChangeNotifier {
   BuildContext? context;
   final PageController pageController = PageController();
   int currentPage = 0;
+  bool isLastPage = false;
 
-  // Add a method to set context
   void setContext(BuildContext ctx) {
     context = ctx;
   }
 
   void updatePageIndicator(int page) {
     currentPage = page;
+    isLastPage = currentPage == 2;
     notifyListeners();
   }
 
@@ -28,14 +28,13 @@ class OnboardingProvider extends ChangeNotifier {
     }
   }
 
-
   void nextPage() {
-    if (currentPage == 2) {
+    if (isLastPage) {
       skipPage();
     } else {
       pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeIn,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOutQuart,
       );
     }
   }
@@ -43,8 +42,8 @@ class OnboardingProvider extends ChangeNotifier {
   void dotNavigationClick(int page) {
     pageController.animateToPage(
       page,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeIn,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutQuart,
     );
   }
 }
@@ -66,21 +65,35 @@ class OnboardingScreen extends StatelessWidget {
         body: Consumer<OnboardingProvider>(
           builder: (context, provider, _) => Stack(
             children: [
+              // Background gradient
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: isDarkMode 
+                      ? [Colors.blue.shade900, Colors.black]
+                      : [Colors.white, Colors.grey.shade100],
+                  ),
+                ),
+              ),
+
+              // PageView with pages
               PageView(
                 controller: provider.pageController,
                 onPageChanged: provider.updatePageIndicator,
                 children: const [
-                  OnBoardingpage(
+                  OnBoardingPage(
                     image: TImages.onBoardingImage1,
                     title: TTexts.onBoardingTitle1,
                     subtitle: TTexts.onBoardingSubTitle1,
                   ),
-                  OnBoardingpage(
+                  OnBoardingPage(
                     image: TImages.onBoardingImage2,
                     title: TTexts.onBoardingTitle2,
                     subtitle: TTexts.onBoardingSubTitle2,
                   ),
-                  OnBoardingpage(
+                  OnBoardingPage(
                     image: TImages.onBoardingImage3,
                     title: TTexts.onBoardingTitle3,
                     subtitle: TTexts.onBoardingSubTitle3,
@@ -88,43 +101,121 @@ class OnboardingScreen extends StatelessWidget {
                 ],
               ),
 
-              // Skip button
+              // Skip button with animation
               Positioned(
                 top: MediaQuery.of(context).padding.top + 16,
                 right: 16,
-                child: TextButton(
-                  onPressed: provider.skipPage,
-                  child: const Text('Skip'),
-                ),
-              ),
-
-              // Page indicator
-              Positioned(
-                bottom: MediaQuery.of(context).size.height * 0.1 + 25,
-                left: 16,
-                child: SmoothPageIndicator(
-                  controller: provider.pageController,
-                  count: 3,
-                  onDotClicked: provider.dotNavigationClick,
-                  effect: ExpandingDotsEffect(
-                    activeDotColor: isDarkMode ? Colors.white : Colors.black,
-                    dotHeight: 6,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: provider.isLastPage ? 0.0 : 1.0,
+                  child: TextButton(
+                    onPressed: provider.isLastPage ? null : provider.skipPage,
+                    style: TextButton.styleFrom(
+                      backgroundColor: isDarkMode 
+                        ? Colors.white.withOpacity(0.1)
+                        : Colors.black.withOpacity(0.1),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                    child: Text(
+                      'Skip',
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ),
 
-              // Next button
+              // Bottom navigation area
               Positioned(
-                right: 16,
-                bottom: MediaQuery.of(context).size.height * 0.1,
-                child: ElevatedButton(
-                  onPressed: provider.nextPage,
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    backgroundColor: isDarkMode ? Colors.blue : Colors.black,
-                    padding: const EdgeInsets.all(16),
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        isDarkMode 
+                          ? Colors.black.withOpacity(0.8)
+                          : Colors.white.withOpacity(0.8),
+                        Colors.transparent,
+                      ],
+                    ),
                   ),
-                  child: const Icon(Iconsax.arrow_right_3),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Page indicator
+                      SmoothPageIndicator(
+                        controller: provider.pageController,
+                        count: 3,
+                        onDotClicked: provider.dotNavigationClick,
+                        effect: ExpandingDotsEffect(
+                          activeDotColor: isDarkMode 
+                            ? Colors.blue 
+                            : Colors.black,
+                          dotColor: isDarkMode 
+                            ? Colors.white38 
+                            : Colors.black26,
+                          dotHeight: 8,
+                          dotWidth: 8,
+                          spacing: 6,
+                          expansionFactor: 4,
+                        ),
+                      ),
+
+                      // Animated next/finish button
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        child: ElevatedButton(
+                          onPressed: provider.nextPage,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isDarkMode 
+                              ? Colors.blue 
+                              : Colors.black,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            elevation: 3,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                provider.isLastPage ? 'Get Started' : 'Next',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Icon(
+                                provider.isLastPage 
+                                  ? Iconsax.login
+                                  : Iconsax.arrow_right_3,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

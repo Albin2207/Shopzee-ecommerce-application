@@ -75,12 +75,21 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   flutter_animate: ^4.5.2
   timelines: ^0.1.0
+  animated_text_kit: ^4.2.3
+  flutter_launcher_icons: ^0.14.3
 
   
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/store.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/icon/forgroundicon.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -102,11 +111,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/banners/banner_2.jpg
-    - assets/images/banners/banner_6.jpg
-    - assets/images/banners/banner_3.jpg
-    - assets/images/banners/
-    - assets/images/animations/
+  
     - assets/images/on_boarding_images/sammy-line-searching.gif
     - assets/images/on_boarding_images/sammy-line-shopping.gif
     - assets/images/on_boarding_images/sammy-line-delivery.gif
@@ -114,9 +119,9 @@ flutter:
     - assets/images/animations/order confirmed.json
     - .env
     - assets/images/user/flat-business-man-user-profile-avatar-icon-vector-4333097.jpg
-    - assets/images/banners/banner_1.jpg
-    - assets/percent-discount-adoption-statistics-offer.jpg
     - assets/west.jpg
+    - assets/icon/store.png
+    - assets/icon/appstore.png
     
   #   - images/a_dot_ham.jpeg
 

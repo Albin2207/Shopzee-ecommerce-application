@@ -46,14 +46,17 @@ class _CartContainerState extends State<CartContainer> {
   increaseCount(int max) async {
     if (count >= max) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Maximum Quantity reached")),
+        const SnackBar(
+          content: Text("Maximum Quantity reached"),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
       return;
     }
 
     Provider.of<CartProvider>(context, listen: false).updateCartQuantity(
       widget.productId,
-      count + 1, // Increase by 1
+      count + 1,
       size: currentSize,
       color: currentColor,
     );
@@ -63,12 +66,11 @@ class _CartContainerState extends State<CartContainer> {
     if (count > 1) {
       Provider.of<CartProvider>(context, listen: false).updateCartQuantity(
         widget.productId,
-        count - 1, // Decrease by 1
+        count - 1,
         size: currentSize,
         color: currentColor,
       );
     } else {
-      // Remove the item if count reaches zero
       Provider.of<CartProvider>(context, listen: false)
           .deleteItem(widget.productId, currentSize, currentColor);
     }
@@ -79,31 +81,44 @@ class _CartContainerState extends State<CartContainer> {
     return Consumer<CartProvider>(
       builder: (context, cartProvider, child) {
         final cartItem = cartProvider.carts.firstWhere(
-          (item) => item.productId == widget.productId && item.selectedSize == currentSize && item.selectedColor == currentColor,
-          orElse: () => CartModel(productId: widget.productId, quantity: widget.selectedQuantity, selectedSize: currentSize, selectedColor: currentColor),
+          (item) =>
+              item.productId == widget.productId &&
+              item.selectedSize == currentSize &&
+              item.selectedColor == currentColor,
+          orElse: () => CartModel(
+              productId: widget.productId,
+              quantity: widget.selectedQuantity,
+              selectedSize: currentSize,
+              selectedColor: currentColor),
         );
         count = cartItem.quantity;
         currentSize = cartItem.selectedSize;
         currentColor = cartItem.selectedColor;
 
         return Card(
-          child: Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(10),
-            margin: EdgeInsets.all(10),
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
             child: Column(
               children: [
                 ProductDetails(widget: widget),
-                SizedBox(height: 16),
-                if (widget.availableSizes.isNotEmpty)
-                  Row(
-                    children: [
-                      Text("Size: "),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    if (widget.availableSizes.isNotEmpty) ...[
+                      const Text("Size:", style: TextStyle(fontSize: 14)),
+                      const SizedBox(width: 4),
                       DropdownButton<String>(
                         value: currentSize,
+                        isDense: true,
                         items: widget.availableSizes
-                            .map((size) =>
-                                DropdownMenuItem(value: size, child: Text(size)))
+                            .map((size) => DropdownMenuItem(
+                                  value: size,
+                                  child: Text(size, style: const TextStyle(fontSize: 14)),
+                                ))
                             .toList(),
                         onChanged: (value) {
                           currentSize = value;
@@ -111,17 +126,19 @@ class _CartContainerState extends State<CartContainer> {
                               .updateVariants(widget.productId, size: value);
                         },
                       ),
+                      const SizedBox(width: 16),
                     ],
-                  ),
-                if (widget.availableColors.isNotEmpty)
-                  Row(
-                    children: [
-                      Text("Color: "),
+                    if (widget.availableColors.isNotEmpty) ...[
+                      const Text("Color:", style: TextStyle(fontSize: 14)),
+                      const SizedBox(width: 4),
                       DropdownButton<String>(
                         value: currentColor,
+                        isDense: true,
                         items: widget.availableColors
                             .map((color) => DropdownMenuItem(
-                                value: color, child: Text(color)))
+                                  value: color,
+                                  child: Text(color, style: const TextStyle(fontSize: 14)),
+                                ))
                             .toList(),
                         onChanged: (value) {
                           currentColor = value;
@@ -130,27 +147,51 @@ class _CartContainerState extends State<CartContainer> {
                         },
                       ),
                     ],
-                  ),
-                SizedBox(height: 16),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
-                    Text("Quantity:"),
-                    SizedBox(width: 8),
-                    IconButton(
-                        onPressed: () async {
-                          decreaseCount();
-                        },
-                        icon: Icon(Icons.remove)), // Decrease button first
-                    Text("$count"),
-                    IconButton(
-                        onPressed: () async {
-                          increaseCount(widget.maxQuantity);
-                        },
-                        icon: Icon(Icons.add)), // Increase button after
-                    Spacer(),
-                    Text("Total: ₹${widget.new_price * count}",
-                        style:
-                            TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
+                    const Text("Qty:", style: TextStyle(fontSize: 14)),
+                    const SizedBox(width: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            onPressed: decreaseCount,
+                            icon: const Icon(Icons.remove, size: 16),
+                            padding: const EdgeInsets.all(4),
+                            constraints: const BoxConstraints(),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              "$count",
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => increaseCount(widget.maxQuantity),
+                            icon: const Icon(Icons.add, size: 16),
+                            padding: const EdgeInsets.all(4),
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      "₹${widget.new_price * count}",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
               ],
